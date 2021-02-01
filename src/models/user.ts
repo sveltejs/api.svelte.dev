@@ -9,6 +9,8 @@ export interface User {
 	uid: UserID;
 	/** GitHub username */
 	username: string;
+	/** First + Last */
+	name: string;
 	/** GitHub avatar */
 	avatar: string;
 	/** GitHub oAuth token */
