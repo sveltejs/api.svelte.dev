@@ -30,13 +30,13 @@ export async function identify(req: ServerRequest, res: ServerResponse): Promise
 	if (!cookie) return res.send(401, 'Missing cookie header');
 
 	const sid = cookies.parse(cookie);
-	if (!sid) return res.send(401, 'Invalid cookie header');
+	if (!sid) return res.send(401, 'Invalid cookie value');
 
 	const session = await lookup(sid);
 	if (!session) return res.send(401, 'Invalid cookie token');
 
 	if (Date.now() >= session.expires) {
-		// TODO: remove KV record
+		await database.remove('session', session.uid);
 		return res.send(401, 'Expired session');
 	}
 
