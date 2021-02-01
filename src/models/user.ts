@@ -12,7 +12,7 @@ export interface User {
 	/** GitHub avatar */
 	avatar: string;
 	/** GitHub oAuth token */
-	token: string;
+	token: GitHub.AccessToken;
 	created_at: TIMESTAMP;
 	updated_at?: TIMESTAMP;
 }
