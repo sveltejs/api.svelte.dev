@@ -9,13 +9,18 @@
     "url": "https://lukeed.com"
   },
   "scripts": {
-    "build": "rollup -c"
+    "dev": "run-p dev:*",
+    "dev:build": "rollup -cw",
+    "dev:server": "wrangler dev",
+    "build": "rollup -c",
+    "test": "tsc --noEmit"
   },
   "dependencies": {
   },
   "devDependencies": {
     "@cloudflare/workers-types": "2.1.0",
     "@rollup/plugin-node-resolve": "11.1.1",
+    "npm-run-all": "4.1.5",
     "rollup": "2.38.2",
     "rollup-plugin-typescript2": "0.29.0",
     "typescript": "3.9.7"
