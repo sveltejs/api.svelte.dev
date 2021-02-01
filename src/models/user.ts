@@ -31,3 +31,26 @@ export async function lookup(uid: UserID) {
 export function gists(uid: UserID): Promise<UserGist[]> {
 	return database.get('owner', uid).then(arr => arr || []);
 }
+
+/** Create a new User record */
+export async function insert(profile: GitHub.User, accesstoken: GitHub.AccessToken): Promise<User | void> {
+	try {
+		const values: User = {
+			uid: profile.id,
+			username: profile.login,
+			name: profile.name,
+			avatar: profile.avatar_url,
+			created_at: Date.now(),
+			updated_at: Date.now(),
+			token: accesstoken,
+		};
+
+		// exit early if could not save new gist record
+		if (!await database.put('user', values.uid, values)) return;
+
+		// return the new item
+		return values;
+	} catch (err) {
+		console.error('user.insert ::', err);
+	}
+}
