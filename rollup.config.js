@@ -1,5 +1,6 @@
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from 'rollup-plugin-typescript2';
+import commonjs from '@rollup/plugin-commonjs';
 
 const isDev = !!process.env.ROLLUP_WATCH;
 
@@ -17,6 +18,9 @@ const config = {
 		resolve({
 			mainFields: ['worker', 'browser', 'module', 'jsnext', 'main'],
 			extensions: ['.ts', '.mjs', '.js', '.json'],
+		}),
+		commonjs({
+			//
 		}),
 		typescript({
 			//
