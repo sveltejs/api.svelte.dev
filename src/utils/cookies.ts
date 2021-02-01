@@ -1,11 +1,13 @@
 import * as cookie from 'cookie';
-import { YEAR } from '../models/session';
 
 import type { SessionID } from '../models/session';
 
 export interface Cookie {
 	sid: SessionID;
 }
+
+// Expires in 1 year (seconds)
+export const EXPIRES = 86400 * 365;
 
 export function isCookie(item: Cookie | Record<string, string>): item is Cookie {
 	return item && typeof item.sid === 'string';
@@ -20,7 +22,7 @@ export function serialize(value: SessionID | null): string {
 	return cookie.serialize('sid', value || '', {
 		path: '/',
 		domain: 'svelte.dev',
-		maxAge: value ? YEAR : -1, // seconds
+		maxAge: value ? EXPIRES : -1,
 		httpOnly: true,
 		secure: true,
 	});
