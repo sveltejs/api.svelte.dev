@@ -2,12 +2,22 @@
   "private": true,
   "version": "0.0.0",
   "name": "api.svelte.dev",
+  "main": "build/index.js",
   "author": {
     "name": "Luke Edwards",
     "email": "luke.edwards05@gmail.com",
     "url": "https://lukeed.com"
   },
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "dependencies": {
+  },
   "devDependencies": {
     "@cloudflare/workers-types": "2.1.0",
+    "@rollup/plugin-node-resolve": "11.1.1",
+    "rollup": "2.38.2",
+    "rollup-plugin-typescript2": "0.29.0",
+    "typescript": "3.9.7"
   }
 }

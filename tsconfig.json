@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "types": ["@cloudflare/workers-types"],
+    "lib": ["esnext", "es2017.object", "dom.iterable", "webworker"],
+    "forceConsistentCasingInFileNames": true,
+    "strictNullChecks": true,
+    "removeComments": true,
+    "skipLibCheck": true,
+    "sourceMap": false,
+    "allowJs": true,
+    "checkJs": true,
+    "strict": true,
+  },
+  "include": [
+    "@types",
+    "src"
+  ],
+  "exclude": [
+    "node_modules/**/*"
+  ]
+}

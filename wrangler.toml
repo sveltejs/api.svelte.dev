@@ -1,0 +1,12 @@
+type = "javascript"
+account_id = ""
+zone_id = ""
+
+# NOTE: default = staging
+name = "svelte-api-staging"
+workers_dev = true
+
+[env.production]
+name = "svelte-api"
+route = "https://api.svelte.dev/*"
+# workers_dev = false
