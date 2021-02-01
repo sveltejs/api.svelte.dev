@@ -1,3 +1,5 @@
+import * as keys from '../utils/keys';
+
 import type { UserID } from './user';
 
 export interface File {
@@ -15,3 +17,6 @@ export interface Gist {
 	created_at: TIMESTAMP;
 	updated_at?: TIMESTAMP;
 }
+
+/** Create new `GistID` value */
+export const toUID = () => keys.gen(36);
