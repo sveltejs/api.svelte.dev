@@ -41,7 +41,6 @@ export async function insert(profile: GitHub.User, accesstoken: GitHub.AccessTok
 			name: profile.name,
 			avatar: profile.avatar_url,
 			created_at: Date.now(),
-			updated_at: Date.now(),
 			token: accesstoken,
 		};
 
