@@ -2,6 +2,7 @@ import * as Gist from '../models/gist';
 import * as Session from '../models/session';
 import * as User from '../models/user';
 
+import type { Handler } from 'worktop';
 import type { GistID } from '../models/gist';
 
 // GET /gists
@@ -25,11 +26,11 @@ export const create = Session.authenticate(async (req, res) => {
 
 
 // GET /gists/:uid
-export const show = Session.authenticate(async (req, res) => {
+export const show: Handler = async (req, res) => {
 	const item = await Gist.lookup(req.params.uid as GistID);
 	if (item) res.send(200, Gist.output(item));
 	else res.send(404, 'Gist not found');
-});
+};
 
 
 // PUT /gists/:uid
