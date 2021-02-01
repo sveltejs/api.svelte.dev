@@ -15,7 +15,8 @@ const config = {
 	},
 	plugins: [
 		resolve({
-			mainFields: ['worker', 'browser', 'module', 'jsnext', 'main']
+			mainFields: ['worker', 'browser', 'module', 'jsnext', 'main'],
+			extensions: ['.ts', '.mjs', '.js', '.json'],
 		}),
 		typescript({
 			//
