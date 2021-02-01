@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "version": "0.0.0",
+  "name": "api.svelte.dev",
+  "author": {
+    "name": "Luke Edwards",
+    "email": "luke.edwards05@gmail.com",
+    "url": "https://lukeed.com"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "2.1.0",
+  }
+}
