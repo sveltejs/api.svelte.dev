@@ -25,6 +25,29 @@ export async function lookup(uid: SessionID) {
 	return database.get('session', uid);
 }
 
+// in milliseconds
+const YEAR = 86400 * 365 * 1000;
+
+/** Create a new Session for the User */
+export async function insert(user: User.User): Promise<Session | void> {
+	try {
+		const values: Session = {
+			// wait until have unique GistID
+			uid: await keys.until(toUID, lookup),
+			userid: user.uid,
+			expires: Date.now() + YEAR
+		};
+
+		// exit early if could not save new gist record
+		if (!await database.put('session', values.uid, values)) return;
+
+		// return the new item
+		return values;
+	} catch (err) {
+		console.error('session.insert ::', err);
+	}
+}
+
 /** Parse the "Cookie" request header; attempt valid `Session` -> `User` lookup */
 export async function identify(req: ServerRequest, res: ServerResponse): Promise<User.User | void> {
 	const cookie = req.headers.get('cookie');
