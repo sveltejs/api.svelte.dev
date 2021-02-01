@@ -16,6 +16,7 @@
     "test": "tsc --noEmit"
   },
   "dependencies": {
+    "uid": "2.0.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "2.1.0",
