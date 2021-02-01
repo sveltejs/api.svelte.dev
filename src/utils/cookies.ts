@@ -1,4 +1,5 @@
 import * as cookie from 'cookie';
+import { YEAR } from '../models/session';
 
 import type { SessionID } from '../models/session';
 
@@ -15,4 +16,12 @@ export function parse(value: string): SessionID | false {
 	return isCookie(item) && item.sid;
 }
 
-// TODO: stringify / create cookie
+export function serialize(value: SessionID | null): string {
+	return cookie.serialize('sid', value || '', {
+		path: '/',
+		domain: 'svelte.dev',
+		maxAge: value ? YEAR : -1, // seconds
+		httpOnly: true,
+		secure: true,
+	});
+}

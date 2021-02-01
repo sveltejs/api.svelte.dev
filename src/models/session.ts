@@ -25,8 +25,7 @@ export async function lookup(uid: SessionID) {
 	return database.get('session', uid);
 }
 
-// in milliseconds
-const YEAR = 86400 * 365 * 1000;
+export const YEAR = 86400 * 365; // in seconds
 
 /** Create a new Session for the User */
 export async function insert(user: User.User): Promise<Session | void> {
@@ -35,7 +34,8 @@ export async function insert(user: User.User): Promise<Session | void> {
 			// wait until have unique GistID
 			uid: await keys.until(toUID, lookup),
 			userid: user.uid,
-			expires: Date.now() + YEAR
+			// convert to milliseconds
+			expires: Date.now() + YEAR * 1000
 		};
 
 		// exit early if could not save new gist record
