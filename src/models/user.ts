@@ -54,3 +54,29 @@ export async function insert(profile: GitHub.User, accesstoken: GitHub.AccessTok
 		console.error('user.insert ::', err);
 	}
 }
+
+/** Update an existing User document */
+export async function update(values: User, profile: GitHub.User, accesstoken: GitHub.AccessToken): Promise<User | void> {
+	try {
+		// update specific attrs
+		values.name = profile.name;
+		values.username = profile.login;
+		values.avatar = profile.avatar_url;
+		values.updated_at = Date.now();
+		values.token = accesstoken;
+
+		// exit early if could not save new gist record
+		if (!await database.put('user', values.uid, values)) return;
+
+		// return the new item
+		return values;
+	} catch (err) {
+		console.error('user.update ::', err);
+	}
+}
+
+/** Format a User for public display */
+export function output(item: User) {
+	const { uid, username, name, avatar } = item;
+	return { uid, username, name, avatar };
+}
