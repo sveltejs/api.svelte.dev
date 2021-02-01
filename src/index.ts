@@ -1,7 +1,10 @@
 import { Router } from 'worktop';
+import * as Auth from './routes/auth';
 import * as Gists from './routes/gists';
 
 const API = new Router();
+
+API.add('GET', '/auth/login', Auth.login);
 
 API.add('GET', '/gists', Gists.list);
 API.add('POST', '/gists', Gists.create);
