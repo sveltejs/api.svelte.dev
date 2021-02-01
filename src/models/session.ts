@@ -12,3 +12,8 @@ export interface Session {
 
 /** Create new `SessionID` value */
 export const toUID = () => keys.gen(32);
+
+/** Find a Session by its public ID value */
+export async function lookup(uid: SessionID) {
+	return database.get('session', uid);
+}

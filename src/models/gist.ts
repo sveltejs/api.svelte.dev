@@ -1,3 +1,4 @@
+import * as database from '../utils/database';
 import * as keys from '../utils/keys';
 
 import type { UserID } from './user';
@@ -20,3 +21,8 @@ export interface Gist {
 
 /** Create new `GistID` value */
 export const toUID = () => keys.gen(36);
+
+/** Find a Gist by its public ID value */
+export async function lookup(uid: GistID) {
+	return database.get('gist', uid);
+}
