@@ -6,6 +6,7 @@ const API = new Router();
 
 API.add('GET', '/auth/login', Auth.login);
 API.add('GET', '/auth/callback', Auth.callback);
+API.add('GET', '/auth/logout', Auth.logout);
 
 API.add('GET', '/gists', Gists.list);
 API.add('POST', '/gists', Gists.create);

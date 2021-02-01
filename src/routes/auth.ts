@@ -50,3 +50,9 @@ export const callback: Handler = async function (req, res) {
 		</script>
 	`);
 }
+
+// GET /auth/logout
+export const logout = Session.authenticate(async (req, res) => {
+	if (await Session.destroy(req.session)) res.send(204);
+	else res.send(500, 'Error destroying session');
+});

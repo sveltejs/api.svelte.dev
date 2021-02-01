@@ -48,6 +48,16 @@ export async function insert(user: User.User): Promise<Session | void> {
 	}
 }
 
+/** Destroy an existing Session document */
+export async function destroy(item: Session): Promise<Session | void> {
+	try {
+		const bool = await database.remove('session', item.uid);
+		if (bool) return item; // return the deleted item
+	} catch (err) {
+		console.error('session.destroy ::', err);
+	}
+}
+
 /** Parse the "Cookie" request header; attempt valid `Session` -> `User` lookup */
 export async function identify(req: ServerRequest, res: ServerResponse): Promise<User.User | void> {
 	const cookie = req.headers.get('cookie');
@@ -72,7 +82,7 @@ export async function identify(req: ServerRequest, res: ServerResponse): Promise
 	return user;
 }
 
-export type AuthorizedRequest = ServerRequest & { user: User.User };
+export type AuthorizedRequest = ServerRequest & { user: User.User, session: Session };
 export type AuthorizedHandler = (req: AuthorizedRequest, res: ServerResponse) => Promise<Response|void>;
 
 /**
