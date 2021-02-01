@@ -5,6 +5,7 @@ import * as keys from '../utils/keys';
 
 // types
 import type { UserID } from './user';
+import type { Handler } from 'worktop';
 import type { ServerResponse } from 'worktop/response';
 import type { ServerRequest } from 'worktop/request';
 
@@ -46,4 +47,25 @@ export async function identify(req: ServerRequest, res: ServerResponse): Promise
 	}
 
 	return user;
+}
+
+export type AuthorizedRequest = ServerRequest & { user: User.User };
+export type AuthorizedHandler = (req: AuthorizedRequest, res: ServerResponse) => Promise<Response|void>;
+
+/**
+ * Authentication Middleware
+ * Only run `handler` if authenticated / valid Cookie.
+ * Guarantees `User` document as `req.user` to `handler`, else error.
+ */
+export function authenticate(handler: AuthorizedHandler): Handler {
+	return async function (req, res) {
+		try {
+			const user = await identify(req, res);
+			if (!user) return; // response sent
+			(req as AuthorizedRequest).user = user;
+			return handler(req as AuthorizedRequest, res);
+		} catch (err) {
+			res.send(err.statusCode || 500, err.data);
+		}
+	};
 }
