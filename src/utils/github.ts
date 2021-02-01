@@ -48,3 +48,17 @@ export async function user(token: GitHub.AccessToken): Promise<GitHub.User | voi
 		console.error('github.user ::', err.stack || err);
 	}
 }
+
+export interface Payload {
+	token: GitHub.AccessToken;
+	profile: GitHub.User;
+}
+
+export async function exchange(code: string): Promise<Payload | void> {
+	const token = await access_token(code);
+
+	if (token) {
+		const profile = await user(token);
+		if (profile) return { token, profile };
+	}
+}
