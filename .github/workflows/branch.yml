@@ -32,8 +32,8 @@ jobs:
     - name: Install
       run: yarn install
 
-    # - name: Type Check
-    #   run: yarn test
+    - name: TypeCheck
+      run: yarn test
 
     - name: Compiles
       run: yarn build
