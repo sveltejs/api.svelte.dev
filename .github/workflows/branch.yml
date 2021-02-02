@@ -1,0 +1,39 @@
+name: Branch (CI)
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+    paths-ignore:
+      - '.vscode/**'
+      - 'scripts/**'
+
+  pull_request:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+    paths-ignore:
+      - '.vscode/**'
+      - 'scripts/**'
+
+jobs:
+  test:
+    name: Node.js v14
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 14
+
+    - name: Install
+      run: yarn install
+
+    # - name: Type Check
+    #   run: yarn test
+
+    - name: Compiles
+      run: yarn build
