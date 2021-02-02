@@ -5,8 +5,6 @@ import * as User from '../models/user';
 import type { Handler } from 'worktop';
 import type { GistID } from '../models/gist';
 
-// TODO(lukeed) worktop types
-
 // GET /gists
 export const list = Session.authenticate(async (req, res) => {
 	// already transformed and sorted by recency
