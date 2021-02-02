@@ -4,7 +4,7 @@ import * as cookies from '../utils/cookies';
 import * as Session from '../models/session';
 import * as User from '../models/user';
 
-import type { Handler } from 'worktop/router';
+import type { Handler } from 'worktop';
 
 // GET /auth/login
 export const login: Handler = function (req, res) {
@@ -14,8 +14,10 @@ export const login: Handler = function (req, res) {
 
 // GET /auth/callback
 export const callback: Handler = async function (req, res) {
+	const code = req.query.get('code') || '';
+	if (!code) return res.send(400, 'Missing "code" parameter');
+
 	// Trade "code" for "access_token"
-	const code = req.query.code as string;
 	const payload = await github.exchange(code);
 	if (!payload) return res.send(400, 'Error with GitHub login');
 
