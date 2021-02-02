@@ -1,0 +1,44 @@
+name: Tag (CD)
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+    # branches-ignore:
+    #   - '**'
+    # tags-ignore:
+    #   - 'v**'
+
+env:
+  # cfw authentication values
+  CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
+  CLOUDFLARE_ZONEID: ${{ secrets.CLOUDFLARE_ZONEID }}
+  CLOUDFLARE_ACCOUNTID: ${{ secrets.CLOUDFLARE_ACCOUNTID }}
+  # worker globals/secrets
+  CLOUDFLARE_NAMESPACEID: ${{ secrets.CLOUDFLARE_NAMESPACEID }}
+  GITHUB_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
+  GITHUB_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
+
+jobs:
+  deploy:
+    name: Node.js v14
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 14
+
+    - name: Install
+      run: yarn install
+
+    - name: Type Check
+      run: yarn test
+
+    - name: Compiles
+      run: yarn build
+
+    - name: Deploy
+      run: yarn deploy
