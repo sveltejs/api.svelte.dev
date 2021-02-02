@@ -1,5 +1,5 @@
+const SELF_API = 'https://api.svelte.dev';
 const GITHUB_API = 'https://github.com/login/oauth';
-const SELF_API = 'process.env.SELF_API'; // via rollup/plugin-replace
 
 // Defined as Worker secrets
 declare var GITHUB_CLIENT_ID: string;

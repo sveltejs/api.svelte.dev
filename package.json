@@ -9,10 +9,8 @@
     "url": "https://lukeed.com"
   },
   "scripts": {
-    "dev": "run-p dev:*",
-    "dev:build": "rollup -cw",
-    "dev:server": "wrangler dev",
-    "build": "rollup -c",
+    "build": "cfw build src --single",
+    "deploy": "cfw deploy src --single",
     "test": "tsc --noEmit"
   },
   "dependencies": {
@@ -24,11 +22,9 @@
   "devDependencies": {
     "@cloudflare/workers-types": "2.1.0",
     "@rollup/plugin-commonjs": "17.1.0",
-    "@rollup/plugin-node-resolve": "11.1.1",
-    "@rollup/plugin-replace": "2.3.4",
     "@types/cookie": "0.4.0",
+    "cfw": "0.0.9",
     "npm-run-all": "4.1.5",
-    "rollup": "2.38.2",
     "rollup-plugin-typescript2": "0.29.0",
     "typescript": "3.9.7"
   }
