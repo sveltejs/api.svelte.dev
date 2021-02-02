@@ -2,6 +2,7 @@ const VARS = process.env;
 
 module.exports = {
 	name: 'svelte-api',
+	profile: 'svelte',
 	routes: [
 		'api.svelte.dev/*'
 	],

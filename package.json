@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "cfw build src --single",
-    "deploy": "cfw deploy src --single",
+    "deploy": "cfw deploy --single",
     "test": "tsc --noEmit"
   },
   "dependencies": {
