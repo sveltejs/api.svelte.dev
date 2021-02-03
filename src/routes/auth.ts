@@ -9,7 +9,7 @@ import type { Handler } from 'worktop';
 // GET /auth/login
 export const login: Handler = function (req, res) {
 	const Location = github.authorize();
-	res.send(302, Location, { Location });
+	return Response.redirect(Location, 302);
 }
 
 // GET /auth/callback
