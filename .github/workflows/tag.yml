@@ -2,14 +2,10 @@ name: Tag (CD)
 
 on:
   push:
-    branches:
+    branches-ignore:
       - '**'
-    tags-ignore:
-      - '**'
-    # branches-ignore:
-    #   - '**'
-    # tags-ignore:
-    #   - 'v**'
+    tags:
+      - 'v**'
 
 env:
   # cfw authentication values
