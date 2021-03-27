@@ -19,7 +19,6 @@
     "worktop": "0.2.0"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "17.1.0",
     "@types/cookie": "0.4.0",
     "cfw": "0.1.2",
     "typescript": "3.9.7"
