@@ -21,8 +21,7 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "17.1.0",
     "@types/cookie": "0.4.0",
-    "cfw": "0.0.10",
-    "rollup-plugin-typescript2": "0.29.0",
+    "cfw": "0.1.1",
     "typescript": "3.9.7"
   }
 }
