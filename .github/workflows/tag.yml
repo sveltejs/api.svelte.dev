@@ -9,9 +9,9 @@ on:
 
 env:
   # cfw authentication values
-  CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
   CLOUDFLARE_ZONEID: ${{ secrets.CLOUDFLARE_ZONEID }}
   CLOUDFLARE_ACCOUNTID: ${{ secrets.CLOUDFLARE_ACCOUNTID }}
+  CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN_DEPLOY }}
   # worker globals/secrets
   CLOUDFLARE_NAMESPACEID: ${{ secrets.CLOUDFLARE_NAMESPACEID }}
   GITHUB_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
