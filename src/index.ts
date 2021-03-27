@@ -1,6 +1,7 @@
 import { Router } from 'worktop';
-import * as Auth from './routes/auth';
+import * as Cache from 'worktop/cache';
 import * as Gists from './routes/gists';
+import * as Auth from './routes/auth';
 
 const API = new Router();
 
@@ -14,4 +15,4 @@ API.add('GET', '/gists/:uid', Gists.show);
 API.add('PUT', '/gists/:uid', Gists.update);
 API.add('DELETE', '/gists/:uid', Gists.destroy);
 
-addEventListener('fetch', API.listen);
+Cache.listen(API.run);

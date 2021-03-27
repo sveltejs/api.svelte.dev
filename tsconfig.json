@@ -6,7 +6,6 @@
     "noImplicitThis": true,
     "moduleResolution": "node",
     "lib": ["es2020", "webworker"],
-    "types": ["@cloudflare/workers-types"],
     "forceConsistentCasingInFileNames": true,
     "strictFunctionTypes": true,
     "strictNullChecks": true,

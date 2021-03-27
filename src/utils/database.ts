@@ -1,8 +1,11 @@
 import * as keys from './keys';
 
+import type { KV } from 'worktop/kv';
 import type { Gist, GistID } from '../models/gist';
 import type { Session, SessionID } from '../models/session';
 import type { User, UserGist, UserID } from '../models/user';
+
+declare const DATAB: KV.Namespace;
 
 export interface Identifiers {
 	gist: GistID;

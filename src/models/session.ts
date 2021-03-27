@@ -4,7 +4,9 @@ import * as cookies from '../utils/cookies';
 import * as keys from '../utils/keys';
 
 // types
-import type { Handler, ServerResponse, ServerRequest } from 'worktop';
+import type { Handler } from 'worktop';
+import type { ServerResponse } from 'worktop/response';
+import type { ServerRequest } from 'worktop/request';
 import type { UserID } from './user';
 
 export type SessionID = Fixed.String<32>;

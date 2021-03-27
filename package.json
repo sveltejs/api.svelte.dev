@@ -16,11 +16,9 @@
   "dependencies": {
     "cookie": "0.4.1",
     "devalue": "2.0.1",
-    "uid": "2.0.0",
-    "worktop": "0.0.4"
+    "worktop": "0.2.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "2.1.0",
     "@rollup/plugin-commonjs": "17.1.0",
     "@types/cookie": "0.4.0",
     "cfw": "0.0.10",

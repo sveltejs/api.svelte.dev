@@ -14,10 +14,12 @@ export const list = Session.authenticate(async (req, res) => {
 
 // POST /gists
 export const create = Session.authenticate(async (req, res) => {
-	const input = req.body;
+	const input = await req.body<Partial<Gist.Gist>>();
+	if (!input) return res.send(400, 'Missing request body');
+
 	// TODO: validate name & files
 	const name = (input.name || '').trim();
-	const files = [].concat(input.files || []);
+	const files = ([] as Gist.File[]).concat(input.files || []);
 
 	const item = await Gist.insert({ name, files }, req.user);
 	if (item) res.send(201, Gist.output(item));
@@ -42,7 +44,10 @@ export const update = Session.authenticate(async (req, res) => {
 		return res.send(403, 'Gist does not belong to you');
 	}
 
-	const values = await Gist.update(item, req.body);
+	const input = await req.body<Gist.Gist>();
+	if (!input) return res.send(400, 'Missing request body');
+
+	const values = await Gist.update(item, input);
 	if (!values) return res.send(500, 'Error updating gist values');
 
 	res.send(200, Gist.output(values));
