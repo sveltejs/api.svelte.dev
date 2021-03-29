@@ -14,12 +14,10 @@
     "test": "tsc --noEmit"
   },
   "dependencies": {
-    "cookie": "0.4.1",
     "devalue": "2.0.1",
-    "worktop": "0.2.0"
+    "worktop": "0.3.0"
   },
   "devDependencies": {
-    "@types/cookie": "0.4.0",
     "cfw": "0.1.2",
     "typescript": "4.2.3"
   }

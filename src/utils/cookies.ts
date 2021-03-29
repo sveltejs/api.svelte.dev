@@ -1,4 +1,4 @@
-import * as cookie from 'cookie';
+import * as cookie from 'worktop/cookie';
 
 import type { SessionID } from '../models/session';
 
@@ -19,11 +19,11 @@ export function parse(value: string): SessionID | false {
 }
 
 export function serialize(value: SessionID | null): string {
-	return cookie.serialize('sid', value || '', {
+	return cookie.stringify('sid', value || '', {
 		path: '/',
 		domain: 'svelte.dev',
-		maxAge: value ? EXPIRES : -1,
-		httpOnly: true,
+		maxage: value ? EXPIRES : -1,
+		httponly: true,
 		secure: true,
 	});
 }
