@@ -3,8 +3,6 @@ import * as keys from '../utils/keys';
 
 import type { UID } from 'worktop/utils';
 
-const TTL = 1000 * 60 * 60 * 24 * 30; // keep list for 30 days after last update
-
 export type TodoID = UID<36>;
 
 // to differentiate from UserID, since user's don't log in
@@ -20,15 +18,20 @@ export interface Todo {
 
 export type TodoList = Todo[];
 
-export async function lookup(userid: GuestID) {
-	return (await database.get('todolist', userid)) || [];
+const TTL = 1000 * 60 * 60 * 24 * 30; // keep todolist for 30 days
+export function sync(userid: GuestID, list: TodoList): Promise<boolean> {
+	return database.put('todolist', userid, list, { expirationTtl: TTL });
+}
+
+export function lookup(userid: GuestID) {
+	return database.get('todolist', userid);
 }
 
 export async function insert(userid: GuestID, text: string) {
 	try {
-		const list = await lookup(userid);
+		const list = await lookup(userid) || [];
 
-		const todo = {
+		const todo: Todo = {
 			uid: keys.gen(36),
 			created_at: Date.now(),
 			text,
@@ -36,10 +39,7 @@ export async function insert(userid: GuestID, text: string) {
 		};
 
 		list.unshift(todo);
-
-		if (!await database.put('todolist', userid, list, {
-			expirationTtl: TTL
-		})) return;
+		if (!await sync(userid, list)) return;
 
 		return todo;
 	} catch (err) {
@@ -62,8 +62,7 @@ export async function update(userid: GuestID, uid: TodoID, patch: { text?: strin
 					todo.done = patch.done as boolean;
 				}
 
-				if (!await database.put('todolist', userid, list, { expirationTtl: TTL })) return;
-				return true;
+				if (await sync(userid, list)) return true;
 			}
 		}
 	} catch (err) {
@@ -81,8 +80,7 @@ export async function destroy(userid: GuestID, uid: TodoID) {
 			if (list[i].uid === uid) {
 				list.splice(i, 1);
 
-				if (!await database.put('todolist', userid, list, { expirationTtl: TTL })) return;
-				return true;
+				if (await sync(userid, list)) return true;
 			}
 		}
 	} catch (err) {
