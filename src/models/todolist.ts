@@ -38,7 +38,7 @@ export async function insert(userid: GuestID, text: string) {
 			done: false
 		};
 
-		list.unshift(todo);
+		list.push(todo);
 		if (!await sync(userid, list)) return;
 
 		return todo;
