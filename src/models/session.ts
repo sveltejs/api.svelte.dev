@@ -5,11 +5,12 @@ import * as keys from '../utils/keys';
 
 // types
 import type { Handler } from 'worktop';
+import type { UID } from 'worktop/utils';
 import type { ServerResponse } from 'worktop/response';
 import type { ServerRequest } from 'worktop/request';
 import type { UserID } from './user';
 
-export type SessionID = Fixed.String<32>;
+export type SessionID = UID<32>;
 
 export interface Session {
 	uid: SessionID;

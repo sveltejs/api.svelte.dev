@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "devalue": "2.0.1",
-    "worktop": "0.3.0"
+    "worktop": "0.4.2"
   },
   "devDependencies": {
     "cfw": "0.1.3",
