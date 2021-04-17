@@ -3,13 +3,14 @@ import * as database from '../utils/database';
 import * as keys from '../utils/keys';
 
 import type { UserID } from './user';
+import type { UID } from 'worktop/utils';
 
 export interface File {
 	name: string;
 	source: string;
 }
 
-export type GistID = Fixed.String<36>;
+export type GistID = UID<36>;
 
 export interface Gist {
 	uid: GistID;
