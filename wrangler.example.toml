@@ -1,0 +1,34 @@
+###
+# NOTE:
+#   We only use Wrangler for the `wrangler dev` command.
+#
+#   Contributors:
+#     Attach your own Cloudflare Account credentials. This
+#     is safe/okay since these values will (and should)
+#     never leave your machine.
+#   Maintainers:
+#     Deployments are done ONLY thru the GitHub Action workflow.
+#     For local development, follow the Contributors section.
+#     If you have account access, you may use `wrangler tail` for logs.
+###
+
+name = "svelte-local"
+type = "javascript"
+workers_dev = true
+zone_id = ""
+route = ""
+
+account_id = "<YOUR ACCOUNT ID>"
+
+[build]
+command = "npm run build"
+upload.format = "service-worker"
+
+[vars]
+GITHUB_CLIENT_ID = "<YOUR GITHUB CLIENT ID>"
+GITHUB_CLIENT_SECRET = "<YOUR GITHUB CLIENT SECRET>"
+
+[[kv_namespaces]]
+binding = "DATAB"
+preview_id = "<YOUR TESTING KV NAMESPACE>"
+id = "<DO NOT CHANGE ME>"
