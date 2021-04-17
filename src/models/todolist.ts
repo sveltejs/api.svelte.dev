@@ -18,7 +18,7 @@ export interface Todo {
 
 export type TodoList = Todo[];
 
-const TTL = 1000 * 60 * 60 * 24 * 30; // keep todolist for 30 days
+const TTL = 60 * 60 * 24 * 30; // 30 days, in seconds
 export function sync(userid: GuestID, list: TodoList): Promise<boolean> {
 	return database.put('todolist', userid, list, { expirationTtl: TTL });
 }
