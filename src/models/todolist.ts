@@ -23,8 +23,8 @@ export function sync(userid: GuestID, list: TodoList): Promise<boolean> {
 	return database.put('todolist', userid, list, { expirationTtl: TTL });
 }
 
-export async function lookup(userid: GuestID) {
-	return (await database.get('todolist', userid)) || [];
+export function lookup(userid: GuestID) {
+	return database.get('todolist', userid);
 }
 
 export async function insert(userid: GuestID, text: string) {
