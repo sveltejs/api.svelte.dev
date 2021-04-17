@@ -10,7 +10,7 @@ type ParamsUserID = Params & { userid: GuestID };
 export const list: Handler<ParamsUserID> = async (req, res) => {
 	const todos = await TodoList.lookup(req.params.userid);
 	if (todos) res.send(200, todos);
-	else res.send(404, 'Todo list not found');
+	else res.send(404, { message: 'Todo list not found' });
 };
 
 // POST /gists/:userid
@@ -21,7 +21,7 @@ export const create: Handler<ParamsUserID> = async (req, res) => {
 	const todo = await TodoList.insert(req.params.userid, input.text);
 
 	if (todo) res.send(201, todo);
-	else res.send(500, 'Error creating todo');
+	else res.send(500, { message: 'Error creating todo' });
 };
 
 // PATCH /gists/:userid/:uid
@@ -32,7 +32,7 @@ export const update: Handler = async (req, res) => {
 	if (!input) return res.send(400, 'Missing request body');
 
 	if (await TodoList.update(userid, uid as TodoID, input)) res.send(204);
-	else res.send(500, 'Error updating todo');
+	else res.send(500, { message: 'Error updating todo' });
 };
 
 // DELETE /gists/:userid/:uid
@@ -40,5 +40,5 @@ export const destroy: Handler = async (req, res) => {
 	const { userid, uid } = req.params;
 
 	if (await TodoList.destroy(userid, uid as TodoID)) res.send(204);
-	else res.send(500, 'Error deleting todo');
+	else res.send(500, { message: 'Error deleting todo' });
 };
