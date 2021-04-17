@@ -1,6 +1,7 @@
 import { Router } from 'worktop';
 import * as Cache from 'worktop/cache';
 import * as Gists from './routes/gists';
+import * as Todos from './routes/todos';
 import * as Auth from './routes/auth';
 
 const API = new Router();
@@ -14,5 +15,10 @@ API.add('POST', '/gists', Gists.create);
 API.add('GET', '/gists/:uid', Gists.show);
 API.add('PUT', '/gists/:uid', Gists.update);
 API.add('DELETE', '/gists/:uid', Gists.destroy);
+
+API.add('GET', '/todos/:userid', Todos.list);
+API.add('POST', '/todos/:userid', Todos.create);
+API.add('PATCH', '/todos/:userid/:uid', Todos.update);
+API.add('DELETE', '/todos/:userid/:uid', Todos.destroy);
 
 Cache.listen(API.run);
