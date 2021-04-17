@@ -10,7 +10,7 @@ module.exports = {
 	routes: [
 		'api.svelte.dev/*'
 	],
-  globals: {
+	globals: {
 		DATAB: `KV:${VARS.CLOUDFLARE_NAMESPACEID}`,
 		GITHUB_CLIENT_ID: `ENV:${VARS.GITHUB_CLIENT_ID}`,
 		GITHUB_CLIENT_SECRET: `SECRET:${VARS.GITHUB_CLIENT_SECRET}`,
