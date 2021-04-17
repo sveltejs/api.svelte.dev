@@ -9,6 +9,7 @@
     "url": "https://lukeed.com"
   },
   "scripts": {
+    "dev": "wrangler dev",
     "build": "cfw build src --single",
     "deploy": "cfw deploy --single",
     "test": "tsc --noEmit"
@@ -18,6 +19,7 @@
     "worktop": "0.3.0"
   },
   "devDependencies": {
+    "@cloudflare/wrangler": "1.16.0",
     "cfw": "0.1.2",
     "typescript": "4.2.3"
   }
