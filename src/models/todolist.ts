@@ -62,7 +62,7 @@ export async function update(userid: GuestID, uid: TodoID, patch: { text?: strin
 					todo.done = patch.done as boolean;
 				}
 
-				if (await sync(userid, list)) return true;
+				if (await sync(userid, list)) return todo;
 			}
 		}
 	} catch (err) {

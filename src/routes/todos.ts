@@ -31,7 +31,9 @@ export const update: Handler = async (req, res) => {
 	const input = await req.body<{ text?: string, done?: boolean }>();
 	if (!input) return res.send(400, 'Missing request body');
 
-	if (await TodoList.update(userid, uid as TodoID, input)) res.send(204);
+	const todo = await TodoList.update(userid, uid as TodoID, input);
+
+	if (todo) res.send(200, todo);
 	else res.send(500, { message: 'Error updating todo' });
 };
 
