@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "0.2.3",
+  "version": "0.3.0",
   "name": "api.svelte.dev",
   "main": "build/index.js",
   "author": {
