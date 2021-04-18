@@ -43,7 +43,7 @@ export async function insert(userid: GuestID, text: string) {
 
 		return todo;
 	} catch (err) {
-		console.error('todolist.insert ::', err);
+		console.error('todolist.insert ::', err.message);
 	}
 }
 
@@ -66,7 +66,7 @@ export async function update(userid: GuestID, uid: TodoID, patch: { text?: strin
 			}
 		}
 	} catch (err) {
-		console.error('todolist.update ::', err);
+		console.error('todolist.update ::', err.message);
 	}
 }
 
@@ -84,6 +84,6 @@ export async function destroy(userid: GuestID, uid: TodoID) {
 			}
 		}
 	} catch (err) {
-		console.error('todolist.destroy ::', err);
+		console.error('todolist.destroy ::', err.message);
 	}
 }
