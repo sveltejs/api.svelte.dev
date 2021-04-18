@@ -41,6 +41,6 @@ export const update: Handler = async (req, res) => {
 export const destroy: Handler = async (req, res) => {
 	const { userid, uid } = req.params;
 
-	if (await TodoList.destroy(userid, uid as TodoID)) res.send(204);
+	if (await TodoList.destroy(userid, uid as TodoID)) res.send(200, {});
 	else res.send(500, { message: 'Error deleting todo' });
 };
