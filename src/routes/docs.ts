@@ -1,4 +1,5 @@
 import * as Docs from "../models/docs";
+import { toError } from "../utils";
 
 import type { Handler } from "worktop";
 import type { Params } from "worktop/request";
@@ -15,10 +16,7 @@ export const list: Handler<ParamsDocsList> = async (req, res) => {
 	const docs = await Docs.list(project, type, version, full);
 
 	if (docs) res.send(200, docs);
-	else
-		res.send(404, {
-			message: `'${project}@${version}' '${type}' entry not found.`,
-		});
+	else toError(res, 404, `'${project}@${version}' '${type}' entry not found.`);
 };
 
 // GET /docs/:project/:type/:slug(?version=beta)
@@ -30,7 +28,9 @@ export const entry: Handler<ParamsDocsEntry> = async (req, res) => {
 
 	if (entry) res.send(200, entry);
 	else
-		res.send(404, {
-			message: `'${project}@${version}' '${type}' entry for '${slug}' not found.`,
-		});
+		toError(
+			res,
+			404,
+			`'${project}@${version}' '${type}' entry for '${slug}' not found.`
+		);
 };

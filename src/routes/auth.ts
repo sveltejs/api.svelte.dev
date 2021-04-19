@@ -1,4 +1,5 @@
 import devalue from 'devalue';
+import { toError } from '../utils';
 import * as github from '../utils/github';
 import * as cookies from '../utils/cookies';
 import * as Session from '../models/session';
@@ -15,11 +16,11 @@ export const login: Handler = function (req, res) {
 // GET /auth/callback
 export const callback: Handler = async function (req, res) {
 	const code = req.query.get('code') || '';
-	if (!code) return res.send(400, 'Missing "code" parameter');
+	if (!code) return toError(res, 400, 'Missing "code" parameter');
 
 	// Trade "code" for "access_token"
 	const payload = await github.exchange(code);
-	if (!payload) return res.send(400, 'Error with GitHub login');
+	if (!payload) return toError(res, 400, 'Error with GitHub login');
 
 	const { token, profile } = payload;
 
@@ -27,16 +28,16 @@ export const callback: Handler = async function (req, res) {
 
 	if (user) {
 		const item = await User.update(user, profile, token);
-		if (!item) return res.send(500, 'Error updating user document');
+		if (!item) return toError(res, 500, 'Error updating user document');
 		user = item;
 	} else {
 		const item = await User.insert(profile, token);
-		if (!item) return res.send(500, 'Error creating user document');
+		if (!item) return toError(res, 500, 'Error creating user document');
 		user = item;
 	}
 
 	const session = await Session.insert(user);
-	if (!session) return res.send(500, 'Error creating user session');
+	if (!session) return toError(res, 500, 'Error creating user session');
 
 	res.setHeader('Content-Type', 'text/html;charset=utf-8');
 	res.setHeader('Set-Cookie', cookies.serialize(session.uid));
@@ -56,5 +57,5 @@ export const callback: Handler = async function (req, res) {
 // GET /auth/logout
 export const logout = Session.authenticate(async (req, res) => {
 	if (await Session.destroy(req.session)) res.send(204);
-	else res.send(500, 'Error destroying session');
+	else toError(res, 500, 'Error destroying session');
 });
