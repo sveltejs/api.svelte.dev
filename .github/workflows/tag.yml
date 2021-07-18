@@ -3,9 +3,9 @@ name: Tag (CD)
 on:
   push:
     branches-ignore:
-      - '**'
+      - "**"
     tags:
-      - 'v**'
+      - "v**"
 
 env:
   # cfw authentication values
@@ -23,19 +23,20 @@ jobs:
     name: Node.js v14
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
-      with:
-        node-version: 14
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+          cache: npm
 
-    - name: Install
-      run: yarn install
+      - name: Install
+        run: yarn install
 
-    - name: Type Check
-      run: yarn test
+      - name: Type Check
+        run: yarn test
 
-    - name: Compiles
-      run: yarn build
+      - name: Compiles
+        run: yarn build
 
-    - name: Deploy
-      run: yarn deploy
+      - name: Deploy
+        run: yarn deploy
