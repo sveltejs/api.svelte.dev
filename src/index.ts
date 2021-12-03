@@ -1,4 +1,5 @@
 import { Router } from 'worktop';
+import * as CORS from 'worktop/cors';
 import * as Cache from 'worktop/cache';
 import * as Gists from './routes/gists';
 import * as Todos from './routes/todos';
@@ -6,6 +7,8 @@ import * as Auth from './routes/auth';
 import * as Docs from './routes/docs';
 
 const API = new Router();
+
+API.prepare = CORS.preflight();
 
 API.add('GET', '/auth/login', Auth.login);
 API.add('GET', '/auth/callback', Auth.callback);
