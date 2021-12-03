@@ -8,7 +8,9 @@ import * as Docs from './routes/docs';
 
 const API = new Router();
 
-API.prepare = CORS.preflight();
+API.prepare = CORS.preflight({
+	maxage: 3600
+});
 
 API.add('GET', '/auth/login', Auth.login);
 API.add('GET', '/auth/callback', Auth.callback);
