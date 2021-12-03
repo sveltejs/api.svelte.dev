@@ -20,7 +20,7 @@ export const list: Handler<ParamsDocsList> = async (req, res) => {
 	const docs = await Docs.list(project, type, version, full);
 
 	if (docs) res.send(200, docs, cors);
-	else toError(res, 404, `'${project}@${version}' '${type}' entry not found.`);
+	else toError(res, 404, `'${project}@${version}' '${type}' entry not found.`, cors);
 };
 
 // GET /docs/:project/:type/:slug(?version=beta)
@@ -35,6 +35,7 @@ export const entry: Handler<ParamsDocsEntry> = async (req, res) => {
 		toError(
 			res,
 			404,
-			`'${project}@${version}' '${type}' entry for '${slug}' not found.`
+			`'${project}@${version}' '${type}' entry for '${slug}' not found.`,
+			cors
 		);
 };
