@@ -7,10 +7,6 @@ import type { Params } from "worktop/request";
 type ParamsDocsList = Params & { project: string; type: string };
 type ParamsDocsEntry = Params & { project: string; type: string; slug: string };
 
-const cors = {
-	'access-control-allow-origin': '*'
-};
-
 // GET /docs/:project/:type(?version=beta&content)
 export const list: Handler<ParamsDocsList> = async (req, res) => {
 	const { project, type } = req.params;
@@ -19,7 +15,7 @@ export const list: Handler<ParamsDocsList> = async (req, res) => {
 
 	const docs = await Docs.list(project, type, version, full);
 
-	if (docs) res.send(200, docs, cors);
+	if (docs) res.send(200, docs);
 	else toError(res, 404, `'${project}@${version}' '${type}' entry not found.`);
 };
 
@@ -30,7 +26,7 @@ export const entry: Handler<ParamsDocsEntry> = async (req, res) => {
 
 	const entry = await Docs.entry(project, type, slug, version);
 
-	if (entry) res.send(200, entry, cors);
+	if (entry) res.send(200, entry);
 	else
 		toError(
 			res,
