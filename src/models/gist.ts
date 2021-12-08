@@ -30,65 +30,52 @@ export async function lookup(uid: GistID) {
 }
 
 /** Create a new Gist for the User */
-export async function insert(input: Partial<Gist>, user: User.User): Promise<Gist | void> {
-	try {
-		const values: Gist = {
-			// wait until have unique GistID
-			uid: await keys.until(toUID, lookup),
-			name: input.name || '',
-			files: input.files || [],
-			userid: user.uid,
-			created_at: Date.now()
-		};
+export async function insert(input: Partial<Gist>, user: User.User): Promise<Gist> {
+	const values: Gist = {
+		// wait until have unique GistID
+		uid: await keys.until(toUID, lookup),
+		name: input.name || '',
+		files: input.files || [],
+		userid: user.uid,
+		created_at: Date.now()
+	};
 
-		// exit early if could not save new gist record
-		if (!await database.put('gist', values.uid, values)) return;
+	await database.put('gist', values.uid, values);
 
-		// synchronize the owner's list of gists
-		if (!await sync(values.userid, values)) return;
+	// synchronize the owner's list of gists
+	await sync(values.userid, values);
 
-		// return the new item
-		return values;
-	} catch (err) {
-		console.error('gist.insert ::', err);
-	}
+	// return the new item
+	return values;
 }
 
 /** Update the name and/or files for an existing Gist */
-export async function update(values: Gist, changes: Gist): Promise<Gist | void> {
-	try {
-		// carefully choose updated keys
-		values.name = changes.name || values.name;
-		values.files = changes.files || values.files;
-		values.updated_at = Date.now();
+export async function update(values: Gist, changes: Gist): Promise<Gist> {
+	// carefully choose updated keys
+	values.name = changes.name || values.name;
+	values.files = changes.files || values.files;
+	values.updated_at = Date.now();
 
-		// update the gist with its new values
-		if (!await database.put('gist', values.uid, values)) return;
+	// update the gist with its new values
+	await database.put('gist', values.uid, values);
 
-		// synchronize the owner's list of gists
-		if (!await sync(values.userid, values)) return;
+	// synchronize the owner's list of gists
+	await sync(values.userid, values);
 
-		// return the updated item
-		return values;
-	} catch (err) {
-		console.error('gist.update ::', err);
-	}
+	// return the updated item
+	return values;
 }
 
 /** Destroy an existing Gist record */
-export async function destroy(item: Gist): Promise<Gist | void> {
-	try {
-		// remove the gist record itself
-		if (!await database.remove('gist', item.uid)) return;
+export async function destroy(item: Gist): Promise<Gist> {
+	// remove the gist record itself
+	await database.remove('gist', item.uid);
 
-		// synchronize the owner's list of gists
-		if (!await sync(item.userid, item, true)) return;
+	// synchronize the owner's list of gists
+	await sync(item.userid, item, true);
 
-		// return the deleted item
-		return item;
-	} catch (err) {
-		console.error('gist.destroy ::', err);
-	}
+	// return the deleted item
+	return item;
 }
 
 /** Synchronize UserGists list for User/Owner */

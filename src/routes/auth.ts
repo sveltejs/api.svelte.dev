@@ -1,5 +1,5 @@
 import devalue from 'devalue';
-import { toError } from '../utils';
+import { HttpError, toError } from '../utils';
 import * as github from '../utils/github';
 import * as cookies from '../utils/cookies';
 import * as Session from '../models/session';
@@ -15,47 +15,52 @@ export const login: Handler = function (req, res) {
 
 // GET /auth/callback
 export const callback: Handler = async function (req, res) {
-	const code = req.query.get('code') || '';
-	if (!code) return toError(res, 400, 'Missing "code" parameter');
+	try {
+		const code = req.query.get('code') || '';
+		if (!code) throw new HttpError('Missing "code" parameter', 400);
 
-	// Trade "code" for "access_token"
-	const payload = await github.exchange(code);
-	if (!payload) return toError(res, 400, 'Error with GitHub login');
+		// Trade "code" for "access_token"
+		const { token, profile } = await github.exchange(code);
 
-	const { token, profile } = payload;
+		let user = await User.lookup(profile.id);
 
-	let user = await User.lookup(profile.id);
+		if (user) {
+			const item = await User.update(user, profile, token);
+			if (!item) return toError(res, 500, 'Error updating user document');
+			user = item;
+		} else {
+			const item = await User.insert(profile, token);
+			if (!item) return toError(res, 500, 'Error creating user document');
+			user = item;
+		}
 
-	if (user) {
-		const item = await User.update(user, profile, token);
-		if (!item) return toError(res, 500, 'Error updating user document');
-		user = item;
-	} else {
-		const item = await User.insert(profile, token);
-		if (!item) return toError(res, 500, 'Error creating user document');
-		user = item;
+		const session = await Session.insert(user);
+		if (!session) return toError(res, 500, 'Error creating user session');
+
+		res.setHeader('Content-Type', 'text/html;charset=utf-8');
+		res.setHeader('Set-Cookie', cookies.serialize(session.uid));
+
+		// sanitize output, hide token
+		const output = User.output(user);
+
+		res.end(`
+			<script>
+				window.opener.postMessage({
+					user: ${devalue(output)}
+				}, window.location.origin);
+			</script>
+		`);
+	} catch (err) {
+		toError(res, (err as HttpError).statusCode || 500, (err as HttpError).message);
 	}
-
-	const session = await Session.insert(user);
-	if (!session) return toError(res, 500, 'Error creating user session');
-
-	res.setHeader('Content-Type', 'text/html;charset=utf-8');
-	res.setHeader('Set-Cookie', cookies.serialize(session.uid));
-
-	// sanitize output, hide token
-	const output = User.output(user);
-
-	res.end(`
-		<script>
-			window.opener.postMessage({
-				user: ${devalue(output)}
-			}, window.location.origin);
-		</script>
-	`);
 }
 
 // GET /auth/logout
 export const logout = Session.authenticate(async (req, res) => {
-	if (await Session.destroy(req.session)) res.send(204);
-	else toError(res, 500, 'Error destroying session');
+	try {
+		await Session.destroy(req.session);
+		res.send(204);
+	} catch {
+		toError(res, 500, 'Error destroying session');
+	}
 });

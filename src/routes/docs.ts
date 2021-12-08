@@ -17,10 +17,12 @@ export const list: Handler<ParamsDocsList> = async (req, res) => {
 	const version = req.query.get("version") || "latest";
 	const full = req.query.get("content") !== null;
 
-	const docs = await Docs.list(project, type, version, full);
-
-	if (docs) res.send(200, docs, headers);
-	else toError(res, 404, `'${project}@${version}' '${type}' entry not found.`);
+	try {
+		const docs = await Docs.list(project, type, version, full);
+		res.send(200, docs, headers);
+	} catch {
+		toError(res, 404, `'${project}@${version}' '${type}' entry not found.`);
+	}
 };
 
 // GET /docs/:project/:type/:slug(?version=beta)
@@ -28,13 +30,10 @@ export const entry: Handler<ParamsDocsEntry> = async (req, res) => {
 	const { project, type, slug } = req.params;
 	const version = req.query.get("version") || "latest";
 
-	const entry = await Docs.entry(project, type, slug, version);
-
-	if (entry) res.send(200, entry, headers);
-	else
-		toError(
-			res,
-			404,
-			`'${project}@${version}' '${type}' entry for '${slug}' not found.`
-		);
+	try {
+		const entry = await Docs.entry(project, type, slug, version);
+		res.send(200, entry, headers);
+	} catch {
+		toError(res, 404, `'${project}@${version}' '${type}' entry for '${slug}' not found.`);
+	}
 };

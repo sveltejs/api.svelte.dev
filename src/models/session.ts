@@ -1,5 +1,5 @@
 import * as User from './user';
-import { toError } from '../utils';
+import { HttpError, toError } from '../utils';
 import * as database from '../utils/database';
 import * as cookies from '../utils/cookies';
 import * as keys from '../utils/keys';
@@ -28,55 +28,46 @@ export async function lookup(uid: SessionID) {
 }
 
 /** Create a new Session for the User */
-export async function insert(user: User.User): Promise<Session | void> {
-	try {
-		const values: Session = {
-			// wait until have unique GistID
-			uid: await keys.until(toUID, lookup),
-			userid: user.uid,
-			// convert to milliseconds
-			expires: Date.now() + cookies.EXPIRES * 1000
-		};
+export async function insert(user: User.User): Promise<Session> {
+	const values: Session = {
+		// wait until have unique GistID
+		uid: await keys.until(toUID, lookup),
+		userid: user.uid,
+		// convert to milliseconds
+		expires: Date.now() + cookies.EXPIRES * 1000
+	};
 
-		// exit early if could not save new gist record
-		if (!await database.put('session', values.uid, values)) return;
+	await database.put('session', values.uid, values);
 
-		// return the new item
-		return values;
-	} catch (err) {
-		console.error('session.insert ::', err);
-	}
+	// return the new item
+	return values;
 }
 
 /** Destroy an existing Session document */
-export async function destroy(item: Session): Promise<Session | void> {
-	try {
-		const bool = await database.remove('session', item.uid);
-		if (bool) return item; // return the deleted item
-	} catch (err) {
-		console.error('session.destroy ::', err);
-	}
+export async function destroy(item: Session): Promise<Session> {
+	await database.remove('session', item.uid);
+	return item; // return the deleted item
 }
 
 /** Parse the "Cookie" request header; attempt valid `Session` -> `User` lookup */
-export async function identify(req: ServerRequest, res: ServerResponse): Promise<User.User | void> {
+export async function identify(req: ServerRequest, res: ServerResponse): Promise<User.User> {
 	const cookie = req.headers.get('cookie');
-	if (!cookie) return toError(res, 401, 'Missing cookie header');
+	if (!cookie) throw new HttpError('Missing cookie header', 401);
 
 	const sid = cookies.parse(cookie);
-	if (!sid) return toError(res, 401, 'Invalid cookie value');
+	if (!sid) throw new HttpError('Invalid cookie value', 401);
 
 	const session = await lookup(sid);
-	if (!session) return toError(res, 401, 'Invalid cookie token');
+	if (!session) throw new HttpError('Invalid cookie token', 401);
 
 	if (Date.now() >= session.expires) {
 		await database.remove('session', session.uid);
-		return toError(res, 401, 'Expired session');
+		throw new HttpError('Expired session', 401);
 	}
 
 	const user = await User.lookup(session.userid);
 	if (!user || user.uid !== session.userid) {
-		return toError(res, 401, 'Invalid session');
+		throw new HttpError('Invalid session', 401);
 	}
 
 	return user;
@@ -93,12 +84,10 @@ export type AuthorizedHandler = (req: AuthorizedRequest, res: ServerResponse) =>
 export function authenticate(handler: AuthorizedHandler): Handler {
 	return async function (req, res) {
 		try {
-			const user = await identify(req, res);
-			if (!user) return; // response sent
-			(req as AuthorizedRequest).user = user;
+			(req as AuthorizedRequest).user = await identify(req, res);
 			return handler(req as AuthorizedRequest, res);
 		} catch (err) {
-			toError(res, err.statusCode || 500, err.data)
+			toError(res, (err as HttpError).statusCode || 500, (err as HttpError).message);
 		}
 	};
 }
