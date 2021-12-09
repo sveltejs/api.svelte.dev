@@ -33,45 +33,35 @@ export function gists(uid: UserID): Promise<UserGist[]> {
 }
 
 /** Create a new User record */
-export async function insert(profile: GitHub.User, accesstoken: GitHub.AccessToken): Promise<User | void> {
-	try {
-		const values: User = {
-			uid: profile.id,
-			username: profile.login,
-			name: profile.name,
-			avatar: profile.avatar_url,
-			created_at: Date.now(),
-			token: accesstoken,
-		};
+export async function insert(profile: GitHub.User, accesstoken: GitHub.AccessToken): Promise<User> {
+	const values: User = {
+		uid: profile.id,
+		username: profile.login,
+		name: profile.name,
+		avatar: profile.avatar_url,
+		created_at: Date.now(),
+		token: accesstoken,
+	};
 
-		// exit early if could not save new gist record
-		if (!await database.put('user', values.uid, values)) return;
+	await database.put('user', values.uid, values);
 
-		// return the new item
-		return values;
-	} catch (err) {
-		console.error('user.insert ::', err);
-	}
+	// return the new item
+	return values;
 }
 
 /** Update an existing User document */
-export async function update(values: User, profile: GitHub.User, accesstoken: GitHub.AccessToken): Promise<User | void> {
-	try {
-		// update specific attrs
-		values.name = profile.name;
-		values.username = profile.login;
-		values.avatar = profile.avatar_url;
-		values.updated_at = Date.now();
-		values.token = accesstoken;
+export async function update(values: User, profile: GitHub.User, accesstoken: GitHub.AccessToken): Promise<User> {
+	// update specific attrs
+	values.name = profile.name;
+	values.username = profile.login;
+	values.avatar = profile.avatar_url;
+	values.updated_at = Date.now();
+	values.token = accesstoken;
 
-		// exit early if could not save new gist record
-		if (!await database.put('user', values.uid, values)) return;
+	await database.put('user', values.uid, values);
 
-		// return the new item
-		return values;
-	} catch (err) {
-		console.error('user.update ::', err);
-	}
+	// return the new item
+	return values;
 }
 
 /** Format a User for public display */

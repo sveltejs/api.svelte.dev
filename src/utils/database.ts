@@ -5,6 +5,7 @@ import type { Gist, GistID } from '../models/gist';
 import type { Session, SessionID } from '../models/session';
 import type { TodoList, GuestID } from '../models/todolist';
 import type { User, UserGist, UserID } from '../models/user';
+import { HttpError } from './error';
 
 declare const DATAB: KV.Namespace;
 
@@ -24,17 +25,22 @@ export interface Models {
 	user: User;
 }
 
-export function get<K extends keyof Identifiers>(type: K, uid: Identifiers[K]): Promise<Models[K] | false> {
+export function get<K extends keyof Identifiers>(type: K, uid: Identifiers[K]): Promise<Models[K]> {
 	const keyname = keys.format<K>(type, uid);
-	return DATAB.get<Models[K]>(keyname, 'json').then(x => x || false);
+
+	try {
+		return DATAB.get<Models[K]>(keyname, 'json');
+	} catch {
+		throw new HttpError('Not found', 404);
+	}
 }
 
-export function put<K extends keyof Identifiers>(type: K, uid: Identifiers[K], value: Models[K], options?: KV.WriteOptions): Promise<boolean> {
+export function put<K extends keyof Identifiers>(type: K, uid: Identifiers[K], value: Models[K], options?: KV.WriteOptions): Promise<void> {
 	const keyname = keys.format<K>(type, uid);
-	return DATAB.put(keyname, JSON.stringify(value), options).then(() => true, () => false);
+	return DATAB.put(keyname, JSON.stringify(value), options);
 }
 
-export async function remove<K extends keyof Identifiers>(type: K, uid: Identifiers[K]): Promise<boolean> {
+export async function remove<K extends keyof Identifiers>(type: K, uid: Identifiers[K]): Promise<void> {
 	const keyname = keys.format<K>(type, uid);
-	return DATAB.delete(keyname).then(() => true, () => false);
+	return DATAB.delete(keyname);
 }

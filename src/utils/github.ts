@@ -1,3 +1,5 @@
+import { HttpError } from './error';
+
 const SELF_API = 'https://api.svelte.dev';
 const GITHUB_API = 'https://github.com/login/oauth';
 
@@ -15,37 +17,32 @@ export function authorize() {
 }
 
 // Trade a "code" for an "access_token"
-export async function access_token(code: string): Promise<GitHub.AccessToken | void> {
+export async function access_token(code: string): Promise<GitHub.AccessToken> {
 	const oauth = new URL(`${GITHUB_API}/access_token`);
 	oauth.searchParams.set('code', code);
 	oauth.searchParams.set('client_id', GITHUB_CLIENT_ID);
 	oauth.searchParams.set('client_secret', GITHUB_CLIENT_SECRET);
 
-	try {
-		const res = await fetch(oauth.href, { method: 'POST' });
-		const values = await res.formData();
+	const res = await fetch(oauth.href, { method: 'POST' });
+	const values = await res.formData();
 
-		const token = values.get('access_token');
-		if (token) return token as GitHub.AccessToken;
-	} catch (err) {
-		console.error('github.access_token', err.stack || err);
-	}
+	const token = values.get('access_token');
+	if (token) return token as GitHub.AccessToken;
+	else throw new HttpError('OAuth failed', 400);
 }
 
-export async function user(token: GitHub.AccessToken): Promise<GitHub.User | void> {
-	try {
-		const res = await fetch('https://api.github.com/user', {
-			headers: {
-				'User-Agent': 'svelte.dev',
-				'Authorization': `token ${token}`
-			}
-		});
-
-		if (res.ok) {
-			return res.json() as Promise<GitHub.User>;
+export async function user(token: GitHub.AccessToken): Promise<GitHub.User> {
+	const res = await fetch('https://api.github.com/user', {
+		headers: {
+			'User-Agent': 'svelte.dev',
+			'Authorization': `token ${token}`
 		}
-	} catch (err) {
-		console.error('github.user ::', err.stack || err);
+	});
+
+	if (res.ok) {
+		return res.json() as Promise<GitHub.User>;
+	} else {
+		throw new HttpError('Authentication failed', 400);
 	}
 }
 
@@ -54,11 +51,9 @@ export interface Payload {
 	profile: GitHub.User;
 }
 
-export async function exchange(code: string): Promise<Payload | void> {
+export async function exchange(code: string): Promise<Payload> {
 	const token = await access_token(code);
+	const profile = await user(token);
 
-	if (token) {
-		const profile = await user(token);
-		if (profile) return { token, profile };
-	}
+	return { token, profile };
 }

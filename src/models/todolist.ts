@@ -19,7 +19,7 @@ export interface Todo {
 export type TodoList = Todo[];
 
 const TTL = 60 * 60 * 24 * 30; // 30 days, in seconds
-export function sync(userid: GuestID, list: TodoList): Promise<boolean> {
+export function sync(userid: GuestID, list: TodoList): Promise<void> {
 	return database.put('todolist', userid, list, { expirationTtl: TTL });
 }
 
@@ -28,62 +28,53 @@ export function lookup(userid: GuestID) {
 }
 
 export async function insert(userid: GuestID, text: string) {
-	try {
-		const list = await lookup(userid) || [];
+	const list = await lookup(userid) || [];
 
-		const todo: Todo = {
-			uid: keys.gen(36),
-			created_at: Date.now(),
-			text,
-			done: false
-		};
+	const todo: Todo = {
+		uid: keys.gen(36),
+		created_at: Date.now(),
+		text,
+		done: false
+	};
 
-		list.push(todo);
-		if (!await sync(userid, list)) return;
+	list.push(todo);
 
-		return todo;
-	} catch (err) {
-		console.error('todolist.insert ::', err.message);
-	}
+	await sync(userid, list);
+
+	return todo;
 }
 
 export async function update(userid: GuestID, uid: TodoID, patch: { text?: string, done?: boolean }) {
-	try {
-		const list = await lookup(userid);
-		if (!list) return;
+	const list = await lookup(userid);
+	if (!list) return;
 
-		for (const todo of list) {
-			if (todo.uid === uid) {
-				if ('text' in patch) {
-					todo.text = patch.text as string;
-				}
-
-				if ('done' in patch) {
-					todo.done = patch.done as boolean;
-				}
-
-				if (await sync(userid, list)) return todo;
+	for (const todo of list) {
+		if (todo.uid === uid) {
+			if ('text' in patch) {
+				todo.text = patch.text as string;
 			}
+
+			if ('done' in patch) {
+				todo.done = patch.done as boolean;
+			}
+
+			await sync(userid, list);
+
+			return todo;
 		}
-	} catch (err) {
-		console.error('todolist.update ::', err.message);
 	}
 }
 
 export async function destroy(userid: GuestID, uid: TodoID) {
-	try {
-		const list = await lookup(userid);
-		if (!list) return;
+	const list = await lookup(userid);
 
-		let i = list.length;
-		while (i--) {
-			if (list[i].uid === uid) {
-				list.splice(i, 1);
+	let i = list.length;
+	while (i--) {
+		if (list[i].uid === uid) {
+			list.splice(i, 1);
 
-				if (await sync(userid, list)) return true;
-			}
+			await sync(userid, list);
+			return;
 		}
-	} catch (err) {
-		console.error('todolist.destroy ::', err.message);
 	}
 }

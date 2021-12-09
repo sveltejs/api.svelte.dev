@@ -1,8 +1,8 @@
 import * as Docs from "../models/docs";
-import { toError } from "../utils";
 
 import type { Handler } from "worktop";
 import type { Params } from "worktop/request";
+import { handler } from "../utils/handler";
 
 type ParamsDocsList = Params & { project: string; type: string };
 type ParamsDocsEntry = Params & { project: string; type: string; slug: string };
@@ -12,29 +12,20 @@ const headers = {
 };
 
 // GET /docs/:project/:type(?version=beta&content)
-export const list: Handler<ParamsDocsList> = async (req, res) => {
+export const list: Handler<ParamsDocsList> = handler(async (req, res) => {
 	const { project, type } = req.params;
 	const version = req.query.get("version") || "latest";
 	const full = req.query.get("content") !== null;
 
 	const docs = await Docs.list(project, type, version, full);
-
-	if (docs) res.send(200, docs, headers);
-	else toError(res, 404, `'${project}@${version}' '${type}' entry not found.`);
-};
+	res.send(200, docs, headers);
+});
 
 // GET /docs/:project/:type/:slug(?version=beta)
-export const entry: Handler<ParamsDocsEntry> = async (req, res) => {
+export const entry: Handler<ParamsDocsEntry> = handler(async (req, res) => {
 	const { project, type, slug } = req.params;
 	const version = req.query.get("version") || "latest";
 
 	const entry = await Docs.entry(project, type, slug, version);
-
-	if (entry) res.send(200, entry, headers);
-	else
-		toError(
-			res,
-			404,
-			`'${project}@${version}' '${type}' entry for '${slug}' not found.`
-		);
-};
+	res.send(200, entry, headers);
+});
