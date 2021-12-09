@@ -1,20 +1,25 @@
 import * as Gist from '../models/gist';
-import * as Session from '../models/session';
 import * as User from '../models/user';
 import { HttpError } from '../utils/error';
 
-import type { Handler } from 'worktop';
 import type { GistID } from '../models/gist';
+import type { UserID } from '../models/user';
 import { handler } from '../utils/handler';
+import { authenticate } from '../utils/auth';
 
-// GET /gists
-export const list = handler(Session.authenticate(async (req, res) => {
-	// already transformed and sorted by recency
-	res.send(200, await User.gists(req.user.uid));
+// GET /gists?userid=userid
+export const list = handler(authenticate(async (req, res) => {
+	const userid = req.query.get('userid') as UserID;
+	if (!userid) throw new HttpError('Missing userid', 400);
+
+	res.send(200, await User.gists(userid));
 }));
 
-// POST /gists
-export const create = handler(Session.authenticate(async (req, res) => {
+// POST /gists?userid=userid
+export const create = handler(authenticate(async (req, res) => {
+	const userid = req.query.get('userid') as UserID;
+	if (!userid) throw new HttpError('Missing userid', 400);
+
 	const input = await req.body<Partial<Gist.Gist>>();
 	if (!input) throw new HttpError('Missing request body', 400);
 
@@ -22,21 +27,24 @@ export const create = handler(Session.authenticate(async (req, res) => {
 	const name = (input.name || '').trim();
 	const files = ([] as Gist.File[]).concat(input.files || []);
 
-	const item = await Gist.insert({ name, files }, req.user);
+	const item = await Gist.insert({ name, files }, userid);
 	res.send(201, Gist.output(item));
 }));
 
-// GET /gists/:uid
-export const show: Handler = handler(async (req, res) => {
-	const item = await Gist.lookup(req.params.uid as GistID);
+// GET /gists/:gistid
+export const show = handler(async (req, res) => {
+	const item = await Gist.lookup(req.params.gistid as GistID);
 	res.send(200, Gist.output(item));
 });
 
-// PUT /gists/:uid
-export const update = handler(Session.authenticate(async (req, res) => {
-	const item = await Gist.lookup(req.params.uid as GistID);
+// PUT /gists/:gistid
+export const update = handler(authenticate(async (req, res) => {
+	const userid = req.query.get('userid') as UserID;
+	if (!userid) throw new HttpError('Missing userid', 400);
 
-	if (req.user.uid !== item.userid) {
+	const item = await Gist.lookup(req.params.gistid as GistID);
+
+	if (userid !== item.userid) {
 		throw new HttpError('Gist does not belong to you', 403);
 	}
 
@@ -48,11 +56,14 @@ export const update = handler(Session.authenticate(async (req, res) => {
 	res.send(200, Gist.output(values));
 }));
 
-// DELETE /gists/:uid
-export const destroy = handler(Session.authenticate(async (req, res) => {
-	const item = await Gist.lookup(req.params.uid as GistID);
+// DELETE /gists/:gistid
+export const destroy = handler(authenticate(async (req, res) => {
+	const userid = req.query.get('userid') as UserID;
+	if (!userid) throw new HttpError('Missing userid', 400);
 
-	if (req.user.uid !== item.userid) {
+	const item = await Gist.lookup(req.params.gistid as GistID);
+
+	if (userid !== item.userid) {
 		throw new HttpError('Gist does not belong to you', 403);
 	}
 

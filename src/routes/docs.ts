@@ -1,8 +1,10 @@
-import * as Docs from "../models/docs";
+import { handler } from "../utils/handler";
 
 import type { Handler } from "worktop";
 import type { Params } from "worktop/request";
-import { handler } from "../utils/handler";
+import type { KV } from "worktop/kv";
+
+declare const DOCS: KV.Namespace;
 
 type ParamsDocsList = Params & { project: string; type: string };
 type ParamsDocsEntry = Params & { project: string; type: string; slug: string };
@@ -17,7 +19,7 @@ export const list: Handler<ParamsDocsList> = handler(async (req, res) => {
 	const version = req.query.get("version") || "latest";
 	const full = req.query.get("content") !== null;
 
-	const docs = await Docs.list(project, type, version, full);
+	const docs = await DOCS.get(`${project}@${version}:${type}:${full ? "content" : "list"}`);
 	res.send(200, docs, headers);
 });
 
@@ -26,6 +28,6 @@ export const entry: Handler<ParamsDocsEntry> = handler(async (req, res) => {
 	const { project, type, slug } = req.params;
 	const version = req.query.get("version") || "latest";
 
-	const entry = await Docs.entry(project, type, slug, version);
+	const entry = await DOCS.get(`${project}@${version}:${type}:${slug}`);
 	res.send(200, entry, headers);
 });

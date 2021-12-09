@@ -10,7 +10,7 @@ export type TodoID = UID<36>;
 export type GuestID = string;
 
 export interface Todo {
-	uid: TodoID;
+	todoid: TodoID;
 	created_at: TIMESTAMP;
 	text: string;
 	done: boolean;
@@ -31,7 +31,7 @@ export async function insert(userid: GuestID, text: string) {
 	const list = await lookup(userid) || [];
 
 	const todo: Todo = {
-		uid: keys.gen(36),
+		todoid: keys.gen(36),
 		created_at: Date.now(),
 		text,
 		done: false
@@ -44,12 +44,12 @@ export async function insert(userid: GuestID, text: string) {
 	return todo;
 }
 
-export async function update(userid: GuestID, uid: TodoID, patch: { text?: string, done?: boolean }) {
+export async function update(userid: GuestID, todoid: TodoID, patch: { text?: string, done?: boolean }) {
 	const list = await lookup(userid);
 	if (!list) return;
 
 	for (const todo of list) {
-		if (todo.uid === uid) {
+		if (todo.todoid === todoid) {
 			if ('text' in patch) {
 				todo.text = patch.text as string;
 			}
@@ -65,12 +65,12 @@ export async function update(userid: GuestID, uid: TodoID, patch: { text?: strin
 	}
 }
 
-export async function destroy(userid: GuestID, uid: TodoID) {
+export async function destroy(userid: GuestID, todoid: TodoID) {
 	const list = await lookup(userid);
 
 	let i = list.length;
 	while (i--) {
-		if (list[i].uid === uid) {
+		if (list[i].todoid === todoid) {
 			list.splice(i, 1);
 
 			await sync(userid, list);

@@ -9,9 +9,9 @@ export function handler(fn: Handler): Handler {
 			const status = (err as HttpError).statusCode || 500;
 			const message = (err as HttpError).message;
 
-			if (status >= 500) {
+			// if (status >= 500) {
 				console.error((err as HttpError).stack);
-			}
+			// }
 
 			res.send(status, { status, message });
 		}

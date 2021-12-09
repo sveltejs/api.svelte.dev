@@ -6,40 +6,40 @@ import type { Params } from 'worktop/request';
 import type { TodoID, GuestID } from '../models/todolist';
 import { handler } from '../utils/handler';
 
-type ParamsUserID = Params & { userid: GuestID };
+type ParamsUserID = Params & { guestid: GuestID };
 
-// GET /todos/:userid
+// GET /todos/:guestid
 export const list: Handler<ParamsUserID> = handler(async (req, res) => {
-	const todos = await TodoList.lookup(req.params.userid);
+	const todos = await TodoList.lookup(req.params.guestid);
 	res.send(200, todos);
 });
 
-// POST /gists/:userid
+// POST /todos/:guestid
 export const create: Handler<ParamsUserID> = handler(async (req, res) => {
 	const input = await req.body<{ text: string }>();
 	if (!input) throw new HttpError('Missing request body', 400);
 
-	const todo = await TodoList.insert(req.params.userid, input.text);
+	const todo = await TodoList.insert(req.params.guestid, input.text);
 
 	res.send(201, todo);
 });
 
-// PATCH /gists/:userid/:uid
+// PATCH /todos/:guestid/:todoid
 export const update: Handler = handler(async (req, res) => {
-	const { userid, uid } = req.params;
+	const { guestid, todoid } = req.params;
 
 	const input = await req.body<{ text?: string, done?: boolean }>();
 	if (!input) throw new HttpError('Missing request body', 400);
 
-	const todo = await TodoList.update(userid, uid as TodoID, input);
+	const todo = await TodoList.update(guestid, todoid as TodoID, input);
 
 	res.send(200, todo);
 });
 
-// DELETE /gists/:userid/:uid
+// DELETE /todos/:guestid/:todoid
 export const destroy: Handler = handler(async (req, res) => {
-	const { userid, uid } = req.params;
+	const { guestid, todoid } = req.params;
 
-	await TodoList.destroy(userid, uid as TodoID);
+	await TodoList.destroy(guestid, todoid as TodoID);
 	res.send(200, {}); // TODO should be a 204, no?
 });

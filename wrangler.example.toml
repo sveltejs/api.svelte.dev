@@ -27,6 +27,7 @@ upload.format = "service-worker"
 [vars]
 GITHUB_CLIENT_ID = "<YOUR GITHUB CLIENT ID>"
 GITHUB_CLIENT_SECRET = "<YOUR GITHUB CLIENT SECRET>"
+SECRET = "<SECRET UUID SHARED WITH AUTHORIZED CLIENTS>"
 
 [[kv_namespaces]]
 binding = "DATAB"
