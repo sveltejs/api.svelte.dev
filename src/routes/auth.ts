@@ -1,5 +1,5 @@
 import devalue from 'devalue';
-import { HttpError, toError } from '../utils';
+import { HttpError } from '../utils/error';
 import * as github from '../utils/github';
 import * as cookies from '../utils/cookies';
 import * as Session from '../models/session';

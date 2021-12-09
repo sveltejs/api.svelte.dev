@@ -1,15 +1,17 @@
-import { Handler } from "worktop";
-import { Params, ServerRequest } from "worktop/request";
-import { ServerResponse } from "worktop/response";
-import { HttpError } from "./index";
+import { Handler } from 'worktop';
+import { HttpError } from './error';
 
 export function handler(fn: Handler): Handler {
 	return async (req, res) => {
 		try {
-			fn(req, res);
+			await fn(req, res);
 		} catch (err) {
 			const status = (err as HttpError).statusCode || 500;
 			const message = (err as HttpError).message;
+
+			if (status >= 500) {
+				console.error((err as HttpError).stack);
+			}
 
 			res.send(status, { status, message });
 		}

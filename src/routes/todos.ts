@@ -1,5 +1,5 @@
 import * as TodoList from '../models/todolist';
-import { HttpError, toError } from '../utils';
+import { HttpError } from '../utils/error';
 
 import type { Handler } from 'worktop';
 import type { Params } from 'worktop/request';

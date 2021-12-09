@@ -1,5 +1,5 @@
 import * as User from './user';
-import { HttpError, toError } from '../utils';
+import { HttpError } from '../utils/error';
 import * as database from '../utils/database';
 import * as cookies from '../utils/cookies';
 import * as keys from '../utils/keys';

@@ -1,7 +1,7 @@
 import * as Gist from '../models/gist';
 import * as Session from '../models/session';
 import * as User from '../models/user';
-import { HttpError } from '../utils';
+import { HttpError } from '../utils/error';
 
 import type { Handler } from 'worktop';
 import type { GistID } from '../models/gist';

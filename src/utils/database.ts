@@ -5,7 +5,7 @@ import type { Gist, GistID } from '../models/gist';
 import type { Session, SessionID } from '../models/session';
 import type { TodoList, GuestID } from '../models/todolist';
 import type { User, UserGist, UserID } from '../models/user';
-import { HttpError } from './index';
+import { HttpError } from './error';
 
 declare const DATAB: KV.Namespace;
 

@@ -1,4 +1,4 @@
-import { HttpError } from "./index";
+import { HttpError } from './error';
 
 const SELF_API = 'https://api.svelte.dev';
 const GITHUB_API = 'https://github.com/login/oauth';
