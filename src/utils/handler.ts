@@ -1,5 +1,5 @@
-import { Handler } from 'worktop';
 import { HttpError } from './error';
+import type { Handler } from 'worktop';
 
 export function handler(fn: Handler): Handler {
 	return async (req, res) => {
