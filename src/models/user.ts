@@ -20,7 +20,7 @@ export interface User {
 }
 
 // The `Gist` attributes saved for `owner` relationship
-export type UserGist = Pick<Gist, 'gistid'|'name'|'updated_at'>;
+export type UserGist = Pick<Gist, 'uid'|'name'|'updated_at'>;
 
 /** Get all Gists belonging to UserID */
 export function gists(userid: UserID): Promise<UserGist[]> {

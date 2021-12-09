@@ -9,9 +9,8 @@ import { authenticate } from '../utils/auth';
 // Expires in 1 year (seconds)
 const EXPIRES = 86400 * 365;
 
-const get_uid = () => keys.gen(32);
-const lookup = async (sessionid: SessionID) => {
-	const exists = await database.has('session', sessionid);
+const deconflict = async (sessionid: string) => {
+	const exists = await database.has('session', sessionid as SessionID);
 	return !exists;
 }
 
@@ -20,7 +19,7 @@ export const create = handler(authenticate(async (req, res) => {
 	const user = await req.body<User.User>();
 	if (!user) throw new HttpError('Missing body', 400);
 
-	const sessionid: SessionID = await keys.until(get_uid, lookup);
+	const sessionid = await keys.unique_uid(deconflict);
 	const expires = Date.now() + EXPIRES * 1000;
 
 	// create or update the user object

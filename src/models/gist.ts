@@ -13,7 +13,7 @@ export interface File {
 export type GistID = UID<36>;
 
 export interface Gist {
-	gistid: GistID;
+	uid: GistID;
 	userid: UserID;
 	name: string;
 	files: File[];
@@ -21,43 +21,44 @@ export interface Gist {
 	updated_at?: TIMESTAMP;
 }
 
-/** Create new `GistID` value */
-export const toUID = () => keys.gen(36);
+export async function deconflict(gistid: string) {
+	const exists = await database.has('gist', gistid as GistID);
+	return !exists;
+}
 
-/** Find a Gist by its public ID value */
-export async function lookup(gistid: GistID) {
+export function lookup(gistid: GistID) {
 	return database.get('gist', gistid);
 }
 
 /** Create a new Gist for the User */
 export async function insert(input: Partial<Gist>, userid: User.UserID): Promise<Gist> {
-	const values: Gist = {
-		// wait until have unique GistID
-		gistid: await keys.until(toUID, lookup),
+	const gist: Gist = {
+		uid: await keys.unique_uid(deconflict),
+		userid,
 		name: input.name || '',
 		files: input.files || [],
-		userid,
 		created_at: Date.now()
 	};
 
-	await database.put('gist', values.gistid, values);
+	await database.put('gist', gist.uid, gist);
 
 	// synchronize the owner's list of gists
-	await sync(userid, values);
+	await sync(userid, gist);
 
 	// return the new item
-	return values;
+	return gist;
 }
 
 /** Update the name and/or files for an existing Gist */
 export async function update(values: Gist, changes: Gist): Promise<Gist> {
 	// carefully choose updated keys
-	values.name = changes.name || values.name;
-	values.files = changes.files || values.files;
+	if ('name' in changes) values.name = changes.name;
+	if ('files' in changes) values.files = changes.files;
+
 	values.updated_at = Date.now();
 
 	// update the gist with its new values
-	await database.put('gist', values.gistid, values);
+	await database.put('gist', values.uid, values);
 
 	// synchronize the owner's list of gists
 	await sync(values.userid, values);
@@ -69,7 +70,7 @@ export async function update(values: Gist, changes: Gist): Promise<Gist> {
 /** Destroy an existing Gist record */
 export async function destroy(gist: Gist) {
 	// remove the gist record itself
-	await database.remove('gist', gist.gistid);
+	await database.remove('gist', gist.uid);
 
 	// synchronize the owner's list of gists
 	await sync(gist.userid, gist, true);
@@ -79,9 +80,9 @@ export async function destroy(gist: Gist) {
 export async function sync(userid: UserID, target: Gist | User.UserGist, isRemove = false) {
 	const list = await User.gists(userid);
 
-	if (target && target.gistid) {
+	if (target && target.uid) {
 		for (let i=0; i < list.length; i++) {
-			if (list[i].gistid === target.gistid) {
+			if (list[i].uid === target.uid) {
 				list.splice(i, 1);
 				break;
 			}
@@ -89,7 +90,7 @@ export async function sync(userid: UserID, target: Gist | User.UserGist, isRemov
 	}
 
 	isRemove || list.unshift({
-		gistid: target.gistid,
+		uid: target.uid,
 		name: target.name,
 		updated_at: target.updated_at || (target as Gist).created_at,
 	});
@@ -102,6 +103,6 @@ export async function sync(userid: UserID, target: Gist | User.UserGist, isRemov
  * @NOTE Matches existing `svelte.dev` Gist output
  */
 export function output(gist: Gist) {
-	const { gistid, name, userid, files } = gist;
-	return { gistid, owner:userid, name, files };
+	const { uid, name, userid, files } = gist;
+	return { uid, owner: userid, name, files };
 }

@@ -20,8 +20,12 @@ export const create = handler(authenticate(async (req, res) => {
 	const userid = req.query.get('userid') as UserID;
 	if (!userid) throw new HttpError('Missing userid', 400);
 
+	console.log({ userid });
+
 	const input = await req.body<Partial<Gist.Gist>>();
 	if (!input) throw new HttpError('Missing request body', 400);
+
+	console.log({ input });
 
 	// TODO: validate name & files
 	const name = (input.name || '').trim();
