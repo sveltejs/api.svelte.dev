@@ -8,13 +8,13 @@ import type { GistID } from '../models/gist';
 import { handler } from '../utils/handler';
 
 // GET /gists
-export const list = Session.authenticate(async (req, res) => {
+export const list = handler(Session.authenticate(async (req, res) => {
 	// already transformed and sorted by recency
 	res.send(200, await User.gists(req.user.uid));
-});
+}));
 
 // POST /gists
-export const create = Session.authenticate(handler(async (req, res) => {
+export const create = handler(Session.authenticate(async (req, res) => {
 	const input = await req.body<Partial<Gist.Gist>>();
 	if (!input) throw new HttpError('Missing request body', 400);
 
@@ -33,7 +33,7 @@ export const show: Handler = handler(async (req, res) => {
 });
 
 // PUT /gists/:uid
-export const update = Session.authenticate(handler(async (req, res) => {
+export const update = handler(Session.authenticate(async (req, res) => {
 	const item = await Gist.lookup(req.params.uid as GistID);
 
 	if (req.user.uid !== item.userid) {
@@ -49,7 +49,7 @@ export const update = Session.authenticate(handler(async (req, res) => {
 }));
 
 // DELETE /gists/:uid
-export const destroy = Session.authenticate(handler(async (req, res) => {
+export const destroy = handler(Session.authenticate(async (req, res) => {
 	const item = await Gist.lookup(req.params.uid as GistID);
 
 	if (req.user.uid !== item.userid) {

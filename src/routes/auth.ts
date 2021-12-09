@@ -48,7 +48,7 @@ export const callback: Handler = handler(async function (req, res) {
 })
 
 // GET /auth/logout
-export const logout = Session.authenticate(handler(async (req, res) => {
+export const logout = handler(Session.authenticate(async (req, res) => {
 	await Session.destroy(req.session);
 	res.send(204);
 }));

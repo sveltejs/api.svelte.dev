@@ -83,11 +83,7 @@ export type AuthorizedHandler = (req: AuthorizedRequest, res: ServerResponse) =>
  */
 export function authenticate(handler: AuthorizedHandler): Handler {
 	return async function (req, res) {
-		try {
-			(req as AuthorizedRequest).user = await identify(req, res);
-			return handler(req as AuthorizedRequest, res);
-		} catch (err) {
-			toError(res, (err as HttpError).statusCode || 500, (err as HttpError).message);
-		}
+		(req as AuthorizedRequest).user = await identify(req, res);
+		return handler(req as AuthorizedRequest, res);
 	};
 }

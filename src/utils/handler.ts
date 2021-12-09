@@ -3,9 +3,7 @@ import { Params, ServerRequest } from "worktop/request";
 import { ServerResponse } from "worktop/response";
 import { HttpError } from "./index";
 
-export function handler<P extends Params = any, Req = ServerRequest<P>>(
-	fn: (req: Req, res: ServerResponse) => Promise<Response|void>
-): (req: Req, res: ServerResponse) => Promise<Response|void> {
+export function handler(fn: Handler): Handler {
 	return async (req, res) => {
 		try {
 			fn(req, res);
