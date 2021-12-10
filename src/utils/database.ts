@@ -14,11 +14,6 @@ export interface Models {
 	todolist: TodoList;
 }
 
-export function has<K extends keyof Identifiers>(type: K, uid: Identifiers[K]): Promise<boolean> {
-	const keyname = keys.format<K>(type, uid);
-	return DATAB.get<Models[K]>(keyname).then(() => true, () => false);
-}
-
 export function get<K extends keyof Identifiers>(type: K, uid: Identifiers[K]): Promise<Models[K]> {
 	const keyname = keys.format<K>(type, uid);
 
