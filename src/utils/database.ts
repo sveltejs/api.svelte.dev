@@ -1,28 +1,17 @@
 import * as keys from './keys';
+import { HttpError } from './error';
 
 import type { KV } from 'worktop/kv';
-import type { Gist, GistID } from '../models/gist';
-import type { Session, SessionID } from '../models/session';
 import type { TodoList, GuestID } from '../models/todolist';
-import type { User, UserGist, UserID } from '../models/user';
-import { HttpError } from './error';
 
 declare const DATAB: KV.Namespace;
 
 export interface Identifiers {
-	gist: GistID;
-	owner: UserID;
-	session: SessionID;
 	todolist: GuestID;
-	user: UserID;
 }
 
 export interface Models {
-	gist: Gist;
-	owner: UserGist[];
-	session: Session;
 	todolist: TodoList;
-	user: User;
 }
 
 export function has<K extends keyof Identifiers>(type: K, uid: Identifiers[K]): Promise<boolean> {
