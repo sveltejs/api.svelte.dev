@@ -12,8 +12,8 @@ API.prepare = CORS.preflight({
 
 API.add('GET', '/todos/:userid', Todos.list);
 API.add('POST', '/todos/:userid', Todos.create);
-API.add('PATCH', '/todos/:userid/:todoid', Todos.update);
-API.add('DELETE', '/todos/:userid/:todoid', Todos.destroy);
+API.add('PATCH', '/todos/:userid/:uid', Todos.update);
+API.add('DELETE', '/todos/:userid/:uid', Todos.destroy);
 
 API.add('GET', '/docs/:project/:type', Docs.list);
 API.add('GET', '/docs/:project/:type/:slug', Docs.entry);

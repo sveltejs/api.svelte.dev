@@ -24,22 +24,22 @@ export const create: Handler<ParamsUserID> = handler(async (req, res) => {
 	res.send(201, todo);
 });
 
-// PATCH /todos/:userid/:todoid
+// PATCH /todos/:userid/:uid
 export const update: Handler = handler(async (req, res) => {
-	const { userid, todoid } = req.params;
+	const { userid, uid } = req.params;
 
 	const input = await req.body<{ text?: string, done?: boolean }>();
 	if (!input) throw new HttpError('Missing request body', 400);
 
-	const todo = await TodoList.update(userid, todoid as TodoID, input);
+	const todo = await TodoList.update(userid, uid as TodoID, input);
 
 	res.send(200, todo);
 });
 
-// DELETE /todos/:userid/:todoid
+// DELETE /todos/:userid/:uid
 export const destroy: Handler = handler(async (req, res) => {
-	const { userid, todoid } = req.params;
+	const { userid, uid } = req.params;
 
-	await TodoList.destroy(userid, todoid as TodoID);
+	await TodoList.destroy(userid, uid as TodoID);
 	res.send(200, {}); // TODO should be a 204, no?
 });
