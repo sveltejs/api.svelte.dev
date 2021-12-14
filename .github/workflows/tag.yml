@@ -15,8 +15,6 @@ env:
   # worker globals/secrets
   CLOUDFLARE_NAMESPACEID: ${{ secrets.CLOUDFLARE_NAMESPACEID }}
   CLOUDFLARE_NAMESPACEID_DOCS: ${{ secrets.CLOUDFLARE_NAMESPACEID_DOCS }}
-  GITHUB_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
-  GITHUB_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
 
 jobs:
   deploy:
