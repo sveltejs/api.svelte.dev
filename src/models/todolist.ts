@@ -19,16 +19,16 @@ export interface Todo {
 export type TodoList = Todo[];
 
 const TTL = 60 * 60 * 24 * 30; // 30 days, in seconds
-export function sync(guestid: GuestID, list: TodoList): Promise<void> {
-	return database.put('todolist', guestid, list, { expirationTtl: TTL });
+export function sync(userid: GuestID, list: TodoList): Promise<void> {
+	return database.put('todolist', userid, list, { expirationTtl: TTL });
 }
 
-export function lookup(guestid: GuestID) {
-	return database.get('todolist', guestid);
+export function lookup(userid: GuestID) {
+	return database.get('todolist', userid);
 }
 
-export async function insert(guestid: GuestID, text: string) {
-	const list = await lookup(guestid) || [];
+export async function insert(userid: GuestID, text: string) {
+	const list = await lookup(userid) || [];
 
 	const todo: Todo = {
 		todoid: keys.uid(36),
@@ -39,13 +39,13 @@ export async function insert(guestid: GuestID, text: string) {
 
 	list.push(todo);
 
-	await sync(guestid, list);
+	await sync(userid, list);
 
 	return todo;
 }
 
-export async function update(guestid: GuestID, todoid: TodoID, patch: { text?: string, done?: boolean }) {
-	const list = await lookup(guestid);
+export async function update(userid: GuestID, todoid: TodoID, patch: { text?: string, done?: boolean }) {
+	const list = await lookup(userid);
 	if (!list) return;
 
 	for (const todo of list) {
@@ -58,22 +58,22 @@ export async function update(guestid: GuestID, todoid: TodoID, patch: { text?: s
 				todo.done = patch.done as boolean;
 			}
 
-			await sync(guestid, list);
+			await sync(userid, list);
 
 			return todo;
 		}
 	}
 }
 
-export async function destroy(guestid: GuestID, todoid: TodoID) {
-	const list = await lookup(guestid);
+export async function destroy(userid: GuestID, todoid: TodoID) {
+	const list = await lookup(userid);
 
 	let i = list.length;
 	while (i--) {
 		if (list[i].todoid === todoid) {
 			list.splice(i, 1);
 
-			await sync(guestid, list);
+			await sync(userid, list);
 			return;
 		}
 	}
