@@ -14,7 +14,7 @@ export const list: Handler<ParamsUserID> = handler(async (req, res) => {
 	res.send(200, todos);
 });
 
-// POST /gists/:userid
+// POST /todos/:userid
 export const create: Handler<ParamsUserID> = handler(async (req, res) => {
 	const input = await req.body<{ text: string }>();
 	if (!input) throw new HttpError('Missing request body', 400);
@@ -24,7 +24,7 @@ export const create: Handler<ParamsUserID> = handler(async (req, res) => {
 	res.send(201, todo);
 });
 
-// PATCH /gists/:userid/:uid
+// PATCH /todos/:userid/:uid
 export const update: Handler = handler(async (req, res) => {
 	const { userid, uid } = req.params;
 
@@ -36,7 +36,7 @@ export const update: Handler = handler(async (req, res) => {
 	res.send(200, todo);
 });
 
-// DELETE /gists/:userid/:uid
+// DELETE /todos/:userid/:uid
 export const destroy: Handler = handler(async (req, res) => {
 	const { userid, uid } = req.params;
 

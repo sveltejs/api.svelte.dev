@@ -31,7 +31,7 @@ export async function insert(userid: GuestID, text: string) {
 	const list = await lookup(userid) || [];
 
 	const todo: Todo = {
-		uid: keys.gen(36),
+		uid: keys.uid(36),
 		created_at: Date.now(),
 		text,
 		done: false
