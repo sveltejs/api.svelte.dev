@@ -47,16 +47,15 @@ export const update: Handler = handler(async (req, res) => {
 	const { guestid, uid } = req.params;
 
 	const body = await req.body<{ text?: string, done?: boolean }>();
-
 	if (!body) throw new HttpError('Missing request body', 400);
-	if (!('text' in body) || !('done' in body)) throw new HttpError('Malformed request body', 400);
+
+	const updated: { text?: string, done?: boolean } = {};
+	if ('text' in body) updated.text = body.text;
+	if ('done' in body) updated.done = body.done;
 
 	const { data, error } = await client
 		.from('todo')
-		.update({
-			text: body.text,
-			done: body.done
-		})
+		.update(updated)
 		.eq('uid', uid)
 		.eq('guestid', guestid);
 
@@ -75,5 +74,5 @@ export const destroy: Handler = handler(async (req, res) => {
 		.eq('guestid', guestid);
 
 	if (error) throw new HttpError(error.message, 500);
-	res.send(204);
+	res.send(200, {}); // TODO should really be a 204, but need to update the template first
 });
