@@ -15,6 +15,7 @@
     "test": "tsc --noEmit"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^1.29.0",
     "devalue": "2.0.1",
     "worktop": "0.4.2"
   },

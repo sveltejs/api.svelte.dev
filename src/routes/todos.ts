@@ -1,45 +1,73 @@
-import * as TodoList from '../models/todolist';
-import { HttpError } from '../utils/error';
+import { createClient } from '@supabase/supabase-js';
+import { HttpError, handler } from '../utils';
 
 import type { Handler } from 'worktop';
 import type { Params } from 'worktop/request';
-import type { TodoID, GuestID } from '../models/todolist';
-import { handler } from '../utils/handler';
 
-type ParamsUserID = Params & { userid: GuestID };
+type TodoListParams = Params & { guestid: string };
+type TodoParams = Params & { guestid: string; uid: string };
 
-// GET /todos/:userid
-export const list: Handler<ParamsUserID> = handler(async (req, res) => {
-	const todos = await TodoList.lookup(req.params.userid);
-	res.send(200, todos);
+declare const SUPABASE_URL: string;
+declare const SUPABASE_KEY: string;
+
+const client = createClient(SUPABASE_URL, SUPABASE_KEY, {
+	// global fetch is sensitive to context, so we need to do this silliness
+	fetch: (init, info) => fetch(init, info)
 });
 
-// POST /todos/:userid
-export const create: Handler<ParamsUserID> = handler(async (req, res) => {
-	const input = await req.body<{ text: string }>();
-	if (!input) throw new HttpError('Missing request body', 400);
+const todos = () => client.from('todo');
 
-	const todo = await TodoList.insert(req.params.userid, input.text);
+// GET /todos/:guestid
+export const list: Handler<TodoListParams> = handler(async (req, res) => {
+	const { data, error } = await todos()
+		.select('uid,text,done')
+		.eq('guestid', req.params.guestid);
 
-	res.send(201, todo);
+	if (error) throw new HttpError(error.message, 500);
+	res.send(200, data);
 });
 
-// PATCH /todos/:userid/:uid
-export const update: Handler = handler(async (req, res) => {
-	const { userid, uid } = req.params;
+// POST /todos/:guestid
+export const create: Handler<TodoListParams> = handler(async (req, res) => {
+	const body = await req.body<{ text: string }>();
+	if (!body) throw new HttpError('Missing request body', 400);
 
-	const input = await req.body<{ text?: string, done?: boolean }>();
-	if (!input) throw new HttpError('Missing request body', 400);
+	const { data, error } = await todos().insert([
+		{
+			guestid: req.params.guestid,
+			text: body.text
+		}
+	]);
 
-	const todo = await TodoList.update(userid, uid as TodoID, input);
-
-	res.send(200, todo);
+	if (error) throw new HttpError(error.message, 500);
+	res.send(201, (data as any[])[0]);
 });
 
-// DELETE /todos/:userid/:uid
-export const destroy: Handler = handler(async (req, res) => {
-	const { userid, uid } = req.params;
+// PATCH /todos/:guestid/:uid
+export const update: Handler<TodoParams> = handler(async (req, res) => {
+	const body = await req.body<{ text?: string, done?: boolean }>();
+	if (!body) throw new HttpError('Missing request body', 400);
 
-	await TodoList.destroy(userid, uid as TodoID);
-	res.send(200, {}); // TODO should be a 204, no?
+	const updated: { text?: string, done?: boolean } = {};
+	if ('text' in body) updated.text = body.text;
+	if ('done' in body) updated.done = body.done;
+
+	const { data, error } = await todos()
+		.update(updated)
+		.eq('uid', req.params.uid)
+		.eq('guestid', req.params.guestid);
+
+	if (error) throw new HttpError(error.message, 500);
+	res.send(200, data);
+});
+
+// DELETE /todos/:guestid/:uid
+export const destroy: Handler<TodoParams> = handler(async (req, res) => {
+	const { error } = await todos()
+		.delete()
+		.eq('uid', req.params.uid)
+		.eq('guestid', req.params.guestid);
+
+	if (error) throw new HttpError(error.message, 500);
+	res.send(200, {}); // TODO should really be a 204, but need to update the template first
 });

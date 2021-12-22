@@ -1,4 +1,4 @@
-import { handler } from "../utils/handler";
+import { handler } from "../utils";
 
 import type { Handler } from "worktop";
 import type { Params } from "worktop/request";
