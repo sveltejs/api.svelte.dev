@@ -1,4 +1,3 @@
-import { HttpError } from './error';
 import type { Handler } from 'worktop';
 
 export function handler(fn: Handler): Handler {
@@ -16,4 +15,13 @@ export function handler(fn: Handler): Handler {
 			res.send(status, { status, message });
 		}
 	};
+}
+
+export class HttpError extends Error {
+	statusCode: number;
+
+	constructor(message: string, statusCode: number) {
+		super(message);
+		this.statusCode = statusCode;
+	}
 }
