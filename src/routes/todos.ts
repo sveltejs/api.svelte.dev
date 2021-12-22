@@ -21,7 +21,8 @@ const todos = () => client.from('todo');
 export const list: Handler<TodoListParams> = handler(async (req, res) => {
 	const { data, error } = await todos()
 		.select('uid,text,done')
-		.eq('guestid', req.params.guestid);
+		.eq('guestid', req.params.guestid)
+		.order('created_at');
 
 	if (error) throw new HttpError(error.message, 500);
 	res.send(200, data);
