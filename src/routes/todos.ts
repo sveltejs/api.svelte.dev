@@ -1,45 +1,79 @@
-import * as TodoList from '../models/todolist';
+import { createClient } from '@supabase/supabase-js';
 import { HttpError } from '../utils/error';
+import { handler } from '../utils/handler';
 
 import type { Handler } from 'worktop';
 import type { Params } from 'worktop/request';
-import type { TodoID, GuestID } from '../models/todolist';
-import { handler } from '../utils/handler';
 
-type ParamsUserID = Params & { userid: GuestID };
+type ParamsUserID = Params & { guestid: string };
 
-// GET /todos/:userid
+declare const SUPABASE_URL: string;
+declare const SUPABASE_KEY: string;
+
+const client = createClient(SUPABASE_URL, SUPABASE_KEY, {
+	// global fetch is sensitive to context, so we need to do this silliness
+	fetch: (init, info) => fetch(init, info)
+});
+
+// GET /todos/:guestid
 export const list: Handler<ParamsUserID> = handler(async (req, res) => {
-	const todos = await TodoList.lookup(req.params.userid);
-	res.send(200, todos);
+	const { data, error } = await client.from('todo')
+		.select('uid,text,done')
+		.eq('guestid', req.params.guestid);
+
+	if (error) throw new HttpError(error.message, 500);
+	res.send(200, data);
 });
 
-// POST /todos/:userid
+// POST /todos/:guestid
 export const create: Handler<ParamsUserID> = handler(async (req, res) => {
-	const input = await req.body<{ text: string }>();
-	if (!input) throw new HttpError('Missing request body', 400);
+	const body = await req.body<{ text: string }>();
+	if (!body) throw new HttpError('Missing request body', 400);
 
-	const todo = await TodoList.insert(req.params.userid, input.text);
+	const { data, error } = await client.from('todo')
+		.insert([
+			{
+				guestid: req.params.guestid,
+				text: body.text
+			}
+		]);
 
-	res.send(201, todo);
+	if (error) throw new HttpError(error.message, 500);
+	res.send(201, (data as any[])[0]);
 });
 
-// PATCH /todos/:userid/:uid
+// PATCH /todos/:guestid/:uid
 export const update: Handler = handler(async (req, res) => {
-	const { userid, uid } = req.params;
+	const { guestid, uid } = req.params;
 
-	const input = await req.body<{ text?: string, done?: boolean }>();
-	if (!input) throw new HttpError('Missing request body', 400);
+	const body = await req.body<{ text?: string, done?: boolean }>();
 
-	const todo = await TodoList.update(userid, uid as TodoID, input);
+	if (!body) throw new HttpError('Missing request body', 400);
+	if (!('text' in body) || !('done' in body)) throw new HttpError('Malformed request body', 400);
 
-	res.send(200, todo);
+	const { data, error } = await client
+		.from('todo')
+		.update({
+			text: body.text,
+			done: body.done
+		})
+		.eq('uid', uid)
+		.eq('guestid', guestid);
+
+	if (error) throw new HttpError(error.message, 500);
+	res.send(200, data);
 });
 
-// DELETE /todos/:userid/:uid
+// DELETE /todos/:guestid/:uid
 export const destroy: Handler = handler(async (req, res) => {
-	const { userid, uid } = req.params;
+	const { guestid, uid } = req.params;
 
-	await TodoList.destroy(userid, uid as TodoID);
-	res.send(200, {}); // TODO should be a 204, no?
+	const { error } = await client
+		.from('todo')
+		.delete()
+		.eq('uid', uid)
+		.eq('guestid', guestid);
+
+	if (error) throw new HttpError(error.message, 500);
+	res.send(204);
 });

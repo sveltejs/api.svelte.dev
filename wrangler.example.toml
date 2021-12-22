@@ -25,6 +25,8 @@ command = "npm run build"
 upload.format = "service-worker"
 
 [vars]
+SUPABASE_URL = "https://kpaaohfbmxvespqoqdzp.supabase.co"
+SUPABASE_KEY = "<YOUR SUPABASE KEY>"
 
 [[kv_namespaces]]
 binding = "DATAB"
