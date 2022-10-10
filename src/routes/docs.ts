@@ -1,4 +1,4 @@
-import { handler } from "../utils";
+import { handler, HttpError } from "../utils";
 
 import type { Handler } from "worktop";
 import type { Params } from "worktop/request";
@@ -20,7 +20,8 @@ export const list: Handler<ParamsDocsList> = handler(async (req, res) => {
 	const full = req.query.get("content") !== null;
 
 	const docs = await DOCS.get(`${project}@${version}:${type}:${full ? "content" : "list"}`);
-	res.send(200, docs, headers);
+	if (!docs) throw new HttpError('Missing document', 404);
+	return res.send(200, docs, headers);
 });
 
 // GET /docs/:project/:type/:slug(?version=beta)
@@ -29,5 +30,6 @@ export const entry: Handler<ParamsDocsEntry> = handler(async (req, res) => {
 	const version = req.query.get("version") || "latest";
 
 	const entry = await DOCS.get(`${project}@${version}:${type}:${slug}`);
-	res.send(200, entry, headers);
+	if (!entry) throw new HttpError('Missing document', 404);
+	return res.send(200, entry, headers);
 });
